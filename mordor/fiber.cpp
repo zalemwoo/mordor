@@ -1,9 +1,8 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include "fiber.h"
-
-#include <boost/thread/tss.hpp>
-
+//#include <boost/thread/tss.hpp>  // Z
+#include <mutex>
 #include "assert.h"
 #include "mordor/config.h"
 #include "exception.h"
@@ -74,11 +73,12 @@ static ConfigVar<size_t>::ptr g_defaultStackSize = Config::lookup<size_t>(
 // ThreadLocalStorage does not
 // t_fiber is a ThreadLocalStorage, because it's faster than boost::tss
 ThreadLocalStorage<Fiber *> Fiber::t_fiber;
-static boost::thread_specific_ptr<Fiber::ptr> t_threadFiber;
+//static boost::thread_specific_ptr<Fiber::ptr> t_threadFiber; // Z
+static thread_local std::unique_ptr<Fiber::ptr> t_threadFiber; // Z
 
-static boost::mutex & g_flsMutex()
+static std::mutex & g_flsMutex()
 {
-    static boost::mutex mutex;
+    static std::mutex mutex;
     return mutex;
 }
 static std::vector<bool> & g_flsIndices()
@@ -539,7 +539,8 @@ Fiber::flsAlloc()
         return result;
     }
 #endif
-    boost::mutex::scoped_lock lock(g_flsMutex());
+//    boost::mutex::scoped_lock lock(g_flsMutex());
+    std::lock_guard<std::mutex> lock(g_flsMutex());
     std::vector<bool>::iterator it = std::find(g_flsIndices().begin(),
         g_flsIndices().end(), false);
     // TODO: we don't clear out values when freeing, so we can't reuse
@@ -566,7 +567,8 @@ Fiber::flsFree(size_t key)
         return;
     }
 #endif
-    boost::mutex::scoped_lock lock(g_flsMutex());
+//    boost::mutex::scoped_lock lock(g_flsMutex());
+    std::lock_guard<std::mutex> lock(g_flsMutex());
     MORDOR_ASSERT(key < g_flsIndices().size());
     MORDOR_ASSERT(g_flsIndices()[key]);
     if (key + 1 == g_flsIndices().size()) {

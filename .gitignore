@@ -51,3 +51,6 @@ x64
 xcuserdata
 tags
 test-results/
+
+.project
+.cproject
