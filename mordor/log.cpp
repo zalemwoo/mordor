@@ -4,8 +4,6 @@
 
 #include <iostream>
 
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-
 #ifndef WINDOWS
 #define SYSLOG_NAMES
 #include <syslog.h>
@@ -62,6 +60,13 @@ static unsigned long long g_start;
 
 namespace {
 
+static inline std::time_t formatTimePoint (const std::chrono::system_clock::time_point& tp)
+{
+     // convert to system time:
+     std::time_t t = std::chrono::system_clock::to_time_t(tp);
+     return t;
+}
+
 static struct LogInitializer
 {
     LogInitializer()
@@ -116,7 +121,7 @@ static std::regex buildLogRegex(const std::string &exp, const std::string &defau
     {
         return std::regex(exp);
     }
-    catch(boost::bad_expression &)
+    catch(std::regex_error &)
     {
         return std::regex(default_exp);
     }
@@ -206,13 +211,13 @@ static void enableFileLogging()
 
 void
 StdoutLogSink::log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+        std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line)
 {
     std::ostringstream os;
-    os << now << " " << elapsed << " " << level << " " << thread << " "
+    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << str << std::endl;
     std::cout << os.str();
@@ -222,13 +227,13 @@ StdoutLogSink::log(const std::string &logger,
 #ifdef WINDOWS
 void
 DebugLogSink::log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+        std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line)
 {
     std::wostringstream os;
-    os << now << " " << elapsed << " " << level << " " << thread << " "
+    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << toUtf16(logger) << " " << toUtf16(file)
         << ":" << line << " " << toUtf16(str) << std::endl;
     OutputDebugStringW(os.str().c_str());
@@ -240,7 +245,7 @@ SyslogLogSink::SyslogLogSink(int facility)
 
 void
 SyslogLogSink::log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+        std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &string,
         const char *file, int line)
@@ -267,7 +272,7 @@ SyslogLogSink::log(const std::string &logger,
             break;
     }
     std::ostringstream os;
-    os << now << " " << elapsed << " " << level << " " << thread << " "
+    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << string << std::endl;
     std::string str = os.str();
@@ -308,13 +313,13 @@ FileLogSink::FileLogSink(const std::string &file)
 
 void
 FileLogSink::log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+        std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line)
 {
     std::ostringstream os;
-    os << now << " " << elapsed << " " << level << " " << thread << " "
+    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << str << std::endl;
     std::string logline = os.str();
@@ -465,7 +470,7 @@ Logger::log(Log::Level level, const std::string &str,
     error_t error = lastError();
     LogDisabler disable;
     unsigned long long elapsed = TimerManager::now() - g_start;
-    boost::posix_time::ptime now = boost::posix_time::microsec_clock::universal_time();
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
     Logger::ptr _this = shared_from_this();
     tid_t thread = gettid();
     void *fiber = Fiber::getThis().get();

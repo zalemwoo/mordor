@@ -17,6 +17,14 @@
 namespace Mordor {
 namespace Test {
 
+
+static inline std::time_t formatTimePoint (const std::chrono::system_clock::time_point& tp)
+{
+     // convert to system time:
+     std::time_t t = std::chrono::system_clock::to_time_t(tp);
+     return t;
+}
+
 class AntXMLLogSink : public LogSink
 {
 public:
@@ -26,7 +34,7 @@ public:
     {}
 
     void log(const std::string &logger,
-             boost::posix_time::ptime now, unsigned long long elapsed,
+             std::chrono::system_clock::time_point now, unsigned long long elapsed,
              tid_t thread, void *fiber,
              Log::Level level, const std::string &str,
              const char* file, int line)
@@ -42,7 +50,7 @@ public:
                 os = m_out;
         }
         if (os) {
-            localOS << now << " " << elapsed << " " << level << " " << thread
+            localOS << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread
                     << " " << fiber << " " << logger << " " << file << ":"
                     << line << " " << str << std::endl;
             boost::mutex::scoped_lock lock(m_mutex);

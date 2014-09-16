@@ -6,9 +6,9 @@
 #include <set>
 #include <sstream>
 #include <functional>
+#include <chrono>
 
 #include "predef.h"
-#include <boost/date_time/posix_time/ptime.hpp>
 
 // For tid_t
 #include "thread.h"
@@ -131,7 +131,7 @@ public:
     /// @param file The source file where the message was generated
     /// @param line The source line where the message was generated
     virtual void log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+            std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line) = 0;
@@ -142,7 +142,7 @@ class StdoutLogSink : public LogSink
 {
 public:
     void log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+            std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line);
@@ -156,7 +156,7 @@ class DebugLogSink : public LogSink
 {
 public:
     void log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+            std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line);
@@ -170,7 +170,7 @@ public:
     SyslogLogSink(int facility);
 
     void log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+            std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line);
@@ -199,7 +199,7 @@ public:
     FileLogSink(const std::string &file);
 
     void log(const std::string &logger,
-        boost::posix_time::ptime now, unsigned long long elapsed,
+            std::chrono::system_clock::time_point now, unsigned long long elapsed,
         tid_t thread, void *fiber,
         Log::Level level, const std::string &str,
         const char *file, int line);
