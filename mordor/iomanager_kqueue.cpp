@@ -310,8 +310,8 @@ IOManager::idle()
                 if (rc2) {
                     try {
                         MORDOR_THROW_EXCEPTION_FROM_LAST_ERROR_API("kevent");
-                    } catch (boost::exception &) {
-                        exception = boost::current_exception();
+                    } catch (std::exception &) {
+                        exception = std::current_exception();
                         continue;
                     }
                 }
@@ -332,7 +332,7 @@ IOManager::idle()
                 m_pendingEvents.erase(it);
         }
         if (exception)
-            boost::rethrow_exception(exception);
+            std::rethrow_exception(exception);
         try {
             Fiber::yield();
         } catch (OperationAbortedException &) {

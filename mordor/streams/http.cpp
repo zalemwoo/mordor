@@ -314,11 +314,11 @@ HTTPStream::startWrite()
         m_writeFuture.signal();
     } catch (OperationAbortedException &) {
         if (!m_abortWrite)
-            m_writeException = boost::current_exception();
+            m_writeException = std::current_exception();
         m_writeInProgress = false;
         m_writeFuture.signal();
     } catch (...) {
-        m_writeException = boost::current_exception();
+        m_writeException = std::current_exception();
         m_writeInProgress = false;
         m_writeFuture.signal();
     }
@@ -368,7 +368,7 @@ HTTPStream::write(const Buffer &buffer, size_t length)
             m_requestHeaders.general.transferEncoding.clear();
         }
 
-        m_writeException = boost::exception_ptr();
+        m_writeException = std::exception_ptr();
         m_writeFuture.reset();
         // Have to schedule this because RequestBroker::request doesn't return
         // until the entire request is complete

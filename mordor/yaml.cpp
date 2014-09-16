@@ -118,7 +118,7 @@ static int getData(void *data, unsigned char *buffer,
         *size_read = context->stream->read(buffer, size);
         return 1;
     } catch (...) {
-        context->exception = boost::current_exception();
+        context->exception = std::current_exception();
         return 0;
     }
 }

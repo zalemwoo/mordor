@@ -3,9 +3,6 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <list>
-
-#include <boost/function.hpp>
-
 #include "exception.h"
 #include "thread_local_storage.h"
 #include "version.h"
@@ -87,14 +84,14 @@ public:
     /// memory; physical/paging memory is not allocated until the actual pages
     /// are touched by the Fiber executing
     /// @post state() == INIT
-    Fiber(boost::function<void ()> dg, size_t stacksize = 0);
+    Fiber(std::function<void ()> dg, size_t stacksize = 0);
     ~Fiber();
 
     /// @brief Reset a Fiber to be used again, with a different initial function
     /// @param dg The new initial function
     /// @pre state() == INIT || state() == TERM || state() == EXCEPT
     /// @post state() == INIT
-    void reset(boost::function<void ()> dg);
+    void reset(std::function<void ()> dg);
 
     /// @return The currently executing Fiber
     static ptr getThis();
@@ -117,7 +114,7 @@ public:
     /// yieldTo(), exception is rethrown in the Fiber
     /// @param exception The exception to be rethrown in the Fiber
     /// @pre state() == INIT || state() == HOLD
-    void inject(boost::exception_ptr exception);
+    void inject(std::exception_ptr exception);
 
     /// Yield execution to a specific Fiber
 
@@ -166,7 +163,7 @@ private:
     void switchContext(Fiber *toFiber);
 
 private:
-    boost::function<void ()> m_dg;
+    std::function<void ()> m_dg;
     void *m_stack, *m_sp;
     size_t m_stacksize;
 #ifdef UCONTEXT_FIBERS
@@ -186,7 +183,7 @@ private:
     State m_state, m_yielderNextState;
     ptr m_outer, m_yielder;
     weak_ptr m_terminateOuter;
-    boost::exception_ptr m_exception;
+    std::exception_ptr m_exception;
 
     static ThreadLocalStorage<Fiber *> t_fiber;
 

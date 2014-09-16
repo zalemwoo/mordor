@@ -107,7 +107,7 @@ Fiber::Fiber()
 #endif
 }
 
-Fiber::Fiber(boost::function<void ()> dg, size_t stacksize)
+Fiber::Fiber(std::function<void ()> dg, size_t stacksize)
 {
     g_statMaxFibers.update(atomicIncrement(g_cntFibers));
     stacksize += g_pagesize - 1;
@@ -155,9 +155,9 @@ Fiber::~Fiber()
 }
 
 void
-Fiber::reset(boost::function<void ()> dg)
+Fiber::reset(std::function<void ()> dg)
 {
-    m_exception = boost::exception_ptr();
+    m_exception = std::exception_ptr();
     MORDOR_ASSERT(m_stack);
     MORDOR_ASSERT(m_state == TERM || m_state == INIT || m_state == EXCEPT);
     m_dg = dg;
@@ -209,7 +209,7 @@ Fiber::call()
 }
 
 void
-Fiber::inject(boost::exception_ptr exception)
+Fiber::inject(std::exception_ptr exception)
 {
     MORDOR_ASSERT(exception);
     m_exception = exception;
@@ -316,12 +316,12 @@ Fiber::entryPoint()
         MORDOR_ASSERT(cur->m_state == EXEC);
         cur->m_dg();
         cur->m_dg = NULL;
-    } catch (boost::exception &ex) {
+    } catch (std::exception &ex) {
         removeTopFrames(ex);
-        cur->m_exception = boost::current_exception();
+        cur->m_exception = std::current_exception();
         nextState = EXCEPT;
     } catch (...) {
-        cur->m_exception = boost::current_exception();
+        cur->m_exception = std::current_exception();
         nextState = EXCEPT;
     }
 

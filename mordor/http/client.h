@@ -115,7 +115,7 @@ private:
     Response m_response;
     EntityHeaders m_requestTrailer, m_responseTrailer;
     State m_requestState, m_responseState;
-    boost::exception_ptr m_priorResponseException;
+    std::exception_ptr m_priorResponseException;
     bool m_badTrailer, m_incompleteTrailer, m_hasResponseBody;
     std::shared_ptr<Stream> m_requestStream;
     std::weak_ptr<Stream> m_responseStream;
