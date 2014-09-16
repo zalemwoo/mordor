@@ -17,7 +17,7 @@ class Connection;
 
 class ConnectionPool : boost::noncopyable {
 public:
-    typedef boost::shared_ptr<ConnectionPool> ptr;
+    typedef std::shared_ptr<ConnectionPool> ptr;
 
     /// Constructor of ConnectionPool
     /// @param conninfo       db connect string
@@ -28,7 +28,7 @@ public:
     ConnectionPool(const std::string &conninfo, IOManager *iomanager,
         size_t size = 5, unsigned long long idleTolerance = 0);
     ~ConnectionPool();
-    boost::shared_ptr<Connection> getConnection();
+    std::shared_ptr<Connection> getConnection();
     void resize(size_t num);
 
 private:
@@ -36,7 +36,7 @@ private:
     bool connectionExpired(unsigned long long freeTime) const;
 
 private:
-    std::list<boost::shared_ptr<Mordor::PQ::Connection> > m_busyConnections;
+    std::list<std::shared_ptr<Mordor::PQ::Connection> > m_busyConnections;
 
     /// @note element of the free list is pair of connection and a timestamp, the
     ///       timestamp indicates that when the connection was put into the free list.
@@ -44,7 +44,7 @@ private:
     //        to calculate wheter the connection has been idle for too long, if so should
     //        re-connect it.
     std::list<std::pair<
-        boost::shared_ptr<Mordor::PQ::Connection>, unsigned long long> > m_freeConnections;
+        std::shared_ptr<Mordor::PQ::Connection>, unsigned long long> > m_freeConnections;
     std::string m_conninfo;
     IOManager *m_iomanager;
     FiberMutex m_mutex;

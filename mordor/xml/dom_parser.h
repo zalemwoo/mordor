@@ -90,7 +90,7 @@ namespace DOM {
     class Document : public Element {
         friend class XMLParser;
     public:
-        typedef boost::shared_ptr<Document> ptr;
+        typedef std::shared_ptr<Document> ptr;
         NodeType nodeType() { return DOCUMENT; }
 
         Element *documentElement() { return m_docElement; }
@@ -111,7 +111,7 @@ namespace DOM {
         Document::ptr loadDocument(const char *str);
         Document::ptr loadDocument(const Buffer& buffer);
         Document::ptr loadDocument(Stream& stream);
-        Document::ptr loadDocument(boost::shared_ptr<Stream> stream);
+        Document::ptr loadDocument(std::shared_ptr<Stream> stream);
 
     protected:
         void onStartTag(const std::string &tag, Document *doc);

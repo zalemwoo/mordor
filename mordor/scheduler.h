@@ -148,7 +148,7 @@ public:
     /// Change the number of threads in this scheduler
     void threadCount(size_t threads);
 
-    const std::vector<boost::shared_ptr<Thread> >& threads() const
+    const std::vector<std::shared_ptr<Thread> >& threads() const
     {
         return m_threads;
     }
@@ -202,12 +202,12 @@ private:
 
 private:
     struct FiberAndThread {
-        boost::shared_ptr<Fiber> fiber;
+        std::shared_ptr<Fiber> fiber;
         boost::function<void ()> dg;
         tid_t thread;
-        FiberAndThread(boost::shared_ptr<Fiber> f, tid_t th)
+        FiberAndThread(std::shared_ptr<Fiber> f, tid_t th)
             : fiber(f), thread(th) {}
-        FiberAndThread(boost::shared_ptr<Fiber>* f, tid_t th)
+        FiberAndThread(std::shared_ptr<Fiber>* f, tid_t th)
             : thread(th) {
             fiber.swap(*f);
         }
@@ -223,9 +223,9 @@ private:
     boost::mutex m_mutex;
     std::list<FiberAndThread> m_fibers;
     tid_t m_rootThread;
-    boost::shared_ptr<Fiber> m_rootFiber;
-    boost::shared_ptr<Fiber> m_callingFiber;
-    std::vector<boost::shared_ptr<Thread> > m_threads;
+    std::shared_ptr<Fiber> m_rootFiber;
+    std::shared_ptr<Fiber> m_callingFiber;
+    std::vector<std::shared_ptr<Thread> > m_threads;
     size_t m_threadCount, m_activeThreadCount, m_idleThreadCount;
     bool m_stopping;
     bool m_autoStop;

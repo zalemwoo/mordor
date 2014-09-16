@@ -99,7 +99,7 @@ Config::loadFromEnvironment()
     wchar_t *enviro = GetEnvironmentStringsW();
     if (!enviro)
         return;
-    boost::shared_ptr<wchar_t> environScope(enviro, &FreeEnvironmentStringsW);
+    std::shared_ptr<wchar_t> environScope(enviro, &FreeEnvironmentStringsW);
     for (const wchar_t *env = enviro; *env; env += wcslen(env) + 1) {
         const wchar_t *equals = wcschr(env, '=');
         if (!equals)
@@ -342,7 +342,7 @@ Config::RegistryMonitor::~RegistryMonitor()
 
 void
 Config::RegistryMonitor::onRegistryChange(
-    boost::weak_ptr<RegistryMonitor> self)
+    std::weak_ptr<RegistryMonitor> self)
 {
     try
     {
@@ -402,12 +402,13 @@ Config::monitorRegistry(IOManager &ioManager, HKEY hKey,
     // we need
     ioManager.registerEvent(result->m_hEvent,
         boost::bind(&RegistryMonitor::onRegistryChange,
-            boost::weak_ptr<RegistryMonitor>(result)), true);
+            std::weak_ptr<RegistryMonitor>(result)), true);
     Mordor::loadFromRegistry(result->m_hKey);
     return result;
 }
 #endif
 
+#if 0 // Zs
 static bool verifyString(const std::string &string)
 {
     stringToMicroseconds(string);
@@ -430,6 +431,7 @@ Timer::ptr associateTimerWithConfigVar(TimerManager &timerManager,
             &updateTimer, _1, result.get()).track(result));
     return result;
 }
+#endif // Ze
 
 static bool verifyThreadCount(int value)
 {

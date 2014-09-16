@@ -55,12 +55,12 @@
 namespace Mordor {
 
 /// Cooperative Thread
-class Fiber : public boost::enable_shared_from_this<Fiber>
+class Fiber : public std::enable_shared_from_this<Fiber>
 {
     template <class T> friend class FiberLocalStorageBase;
 public:
-    typedef boost::shared_ptr<Fiber> ptr;
-    typedef boost::weak_ptr<Fiber> weak_ptr;
+    typedef std::shared_ptr<Fiber> ptr;
+    typedef std::weak_ptr<Fiber> weak_ptr;
 
     /// The current execution state of a Fiber
     enum State

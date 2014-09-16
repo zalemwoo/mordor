@@ -98,8 +98,8 @@ private:
 
 private:
     boost::mutex m_mutex;
-    boost::shared_ptr<Fiber> m_owner;
-    std::list<std::pair<Scheduler *, boost::shared_ptr<Fiber> > > m_waiters;
+    std::shared_ptr<Fiber> m_owner;
+    std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
 
 struct RecursiveFiberMutex : boost::noncopyable
@@ -131,8 +131,8 @@ private:
 
 private:
     boost::mutex m_mutex;
-    boost::shared_ptr<Fiber> m_owner;
-    std::list<std::pair<Scheduler *, boost::shared_ptr<Fiber> > > m_waiters;
+    std::shared_ptr<Fiber> m_owner;
+    std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
     unsigned m_recursion;
 };
 
@@ -160,7 +160,7 @@ public:
 
 private:
     boost::mutex m_mutex;
-    std::list<std::pair<Scheduler *, boost::shared_ptr<Fiber> > > m_waiters;
+    std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
     size_t m_concurrency;
 };
 
@@ -195,7 +195,7 @@ public:
 private:
     boost::mutex m_mutex;
     FiberMutex &m_fiberMutex;
-    std::list<std::pair<Scheduler *, boost::shared_ptr<Fiber> > > m_waiters;
+    std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
 
 /// Scheduler based event variable for Fibers
@@ -227,7 +227,7 @@ private:
     boost::mutex m_mutex;
     bool m_signalled;
     const bool m_autoReset;
-    std::list<std::pair<Scheduler *, boost::shared_ptr<Fiber> > > m_waiters;
+    std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
 
 }

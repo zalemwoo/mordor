@@ -15,7 +15,7 @@ namespace PQ {
 static Logger::ptr g_log = Log::lookup("mordor:pq");
 
 Connection::CopyParams::CopyParams(const std::string &table,
-    boost::shared_ptr<PGconn> conn, SchedulerType *scheduler)
+    std::shared_ptr<PGconn> conn, SchedulerType *scheduler)
     : m_table(table),
       m_scheduler(scheduler),
       m_conn(conn),
@@ -101,14 +101,14 @@ Connection::CopyParams::notNullQuoteColumns(const std::vector<std::string> &colu
 class CopyInStream : public Stream
 {
 public:
-    CopyInStream(boost::shared_ptr<PGconn> conn, SchedulerType *scheduler)
+    CopyInStream(std::shared_ptr<PGconn> conn, SchedulerType *scheduler)
         : m_conn(conn),
           m_scheduler(scheduler)
     {}
 
     ~CopyInStream()
     {
-        boost::shared_ptr<PGconn> sharedConn = m_conn.lock();
+        std::shared_ptr<PGconn> sharedConn = m_conn.lock();
         if (sharedConn) {
             PGconn *conn = sharedConn.get();
             try {
@@ -123,7 +123,7 @@ public:
     void close(CloseType type)
     {
         MORDOR_ASSERT(type & WRITE);
-        boost::shared_ptr<PGconn> sharedConn = m_conn.lock();
+        std::shared_ptr<PGconn> sharedConn = m_conn.lock();
         if (sharedConn) {
             PGconn *conn = sharedConn.get();
             putCopyEnd(conn, NULL);
@@ -133,7 +133,7 @@ public:
 
     size_t write(const void *buffer, size_t length)
     {
-        boost::shared_ptr<PGconn> sharedConn = m_conn.lock();
+        std::shared_ptr<PGconn> sharedConn = m_conn.lock();
         MORDOR_ASSERT(sharedConn);
         PGconn *conn = sharedConn.get();
         int status = 0;
@@ -192,7 +192,7 @@ private:
         if (m_scheduler)
             PQ::flush(conn, m_scheduler);
 #endif
-        boost::shared_ptr<PGresult> result;
+        std::shared_ptr<PGresult> result;
 #ifndef WINDOWS
         if (m_scheduler)
             result.reset(nextResult(conn, m_scheduler), &PQclear);
@@ -217,14 +217,14 @@ private:
     }
 
 private:
-    boost::weak_ptr<PGconn> m_conn;
+    std::weak_ptr<PGconn> m_conn;
     SchedulerType *m_scheduler;
 };
 
 class CopyOutStream : public Stream
 {
 public:
-    CopyOutStream(boost::shared_ptr<PGconn> conn, SchedulerType *scheduler)
+    CopyOutStream(std::shared_ptr<PGconn> conn, SchedulerType *scheduler)
         : m_conn(conn),
           m_scheduler(scheduler)
     {}
@@ -239,7 +239,7 @@ public:
             m_readBuffer.consume(length);
             return length;
         }
-        boost::shared_ptr<PGconn> sharedConn = m_conn.lock();
+        std::shared_ptr<PGconn> sharedConn = m_conn.lock();
         if (!sharedConn)
             return 0;
         PGconn *conn = sharedConn.get();
@@ -286,7 +286,7 @@ public:
 
         if (status == -1) {
             m_conn.reset();
-            boost::shared_ptr<PGresult> result;
+            std::shared_ptr<PGresult> result;
 #ifndef WINDOWS
             if (m_scheduler)
                 result.reset(nextResult(conn, m_scheduler), &PQclear);
@@ -315,7 +315,7 @@ public:
     }
 
 private:
-    boost::weak_ptr<PGconn> m_conn;
+    std::weak_ptr<PGconn> m_conn;
     SchedulerType *m_scheduler;
     Buffer m_readBuffer;
 };
@@ -369,7 +369,7 @@ Connection::CopyParams::execute(bool out)
         }
     }
 
-    boost::shared_ptr<PGresult> result, next;
+    std::shared_ptr<PGresult> result, next;
     const char *api = NULL;
 #ifdef WINDOWS
     SchedulerSwitcher switcher(m_scheduler);

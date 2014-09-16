@@ -15,7 +15,7 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
+// #include <boost/shared_ptr.hpp> // Z
 #include <boost/signals2/signal.hpp>
 
 #include "assert.h"
@@ -78,7 +78,7 @@ std::cout << servername.toString();
 
 To access the real value of a ConfigVar you would typically use a cast operation like this:
 
-ConfigVar<bool>::ptr boolVar = boost::dynamic_pointer_cast<ConfigVar<bool> >(Config::lookup('myapp.showui'))
+ConfigVar<bool>::ptr boolVar = std::dynamic_pointer_cast<ConfigVar<bool> >(Config::lookup('myapp.showui'))
 if (configVarPtr) {
     bool b = boolVar->val();
     ...
@@ -115,7 +115,7 @@ bool isValidConfigVarName(const std::string &name, bool allowDot = true);
 class ConfigVarBase : public boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<ConfigVarBase> ptr;
+    typedef std::shared_ptr<ConfigVarBase> ptr;
 
 public:
     ConfigVarBase(const std::string &name, const std::string &description = "",
@@ -167,7 +167,7 @@ public:
         }
     };
 
-    typedef boost::shared_ptr<ConfigVar> ptr;
+    typedef std::shared_ptr<ConfigVar> ptr;
     typedef boost::signals2::signal<bool (const T&), BreakOnFailureCombiner> before_change_signal_type;
     typedef boost::signals2::signal<void (const T&)> on_change_signal_type;
 
@@ -244,7 +244,7 @@ public:
     {
         friend class Config;
     public:
-        typedef boost::shared_ptr<RegistryMonitor> ptr;
+        typedef std::shared_ptr<RegistryMonitor> ptr;
     private:
         RegistryMonitor(IOManager &iomanager, HKEY hKey,
             const std::wstring &subKey);
@@ -254,7 +254,7 @@ public:
         ~RegistryMonitor();
 
     private:
-        static void onRegistryChange(boost::weak_ptr<RegistryMonitor> self);
+        static void onRegistryChange(std::weak_ptr<RegistryMonitor> self);
 
     private:
         IOManager &m_ioManager;
@@ -349,14 +349,16 @@ class Timer;
 class TimerManager;
 class Scheduler;
 
+#if 0 // Zs
 /// Creates a timer that is controlled by a string ConfigVar
 ///
 /// The timer is automatically updated to use the current value of the
 /// ConfigVar, and the string is parsed with stringToMicroseconds from string.h
-boost::shared_ptr<Timer> associateTimerWithConfigVar(
+std::shared_ptr<Timer> associateTimerWithConfigVar(
     TimerManager &timerManager,
-    boost::shared_ptr<ConfigVar<std::string> > configVar,
+    std::shared_ptr<ConfigVar<std::string> > configVar,
     boost::function<void ()> dg);
+#endif // Ze
 
 /// Associate a scheduler with a ConfigVar
 ///
@@ -364,7 +366,7 @@ boost::shared_ptr<Timer> associateTimerWithConfigVar(
 /// scheduler.  Negative values are taken to mean a multiplier of the number
 /// of available processor cores.
 void associateSchedulerWithConfigVar(Scheduler &scheduler,
-    boost::shared_ptr<ConfigVar<int> > configVar);
+    std::shared_ptr<ConfigVar<int> > configVar);
 
 
 /// helper class to allow temporarily change the ConfigVar Value
@@ -381,7 +383,7 @@ public:
     ~HijackConfigVar();
 
 private:
-    boost::shared_ptr<Mordor::ConfigVarBase> m_var;
+    std::shared_ptr<Mordor::ConfigVarBase> m_var;
     std::string m_oldValue;
 };
 

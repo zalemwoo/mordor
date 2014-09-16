@@ -57,7 +57,7 @@ private:
     STATUS m_lastTimedOut, m_permaTimedOut;
     bool m_autoStart;
     TimeoutDg m_timeoutDg;
-    boost::shared_ptr<Timer> m_timer;
+    std::shared_ptr<Timer> m_timer;
     TimerManager &m_timerManager;
 };
 
@@ -71,7 +71,7 @@ private:
 class TimeoutStream : public FilterStream
 {
 public:
-    typedef boost::shared_ptr<TimeoutStream> ptr;
+    typedef std::shared_ptr<TimeoutStream> ptr;
 
 public:
     TimeoutStream(Stream::ptr parent, TimerManager &timerManager, bool own = true)

@@ -8,7 +8,7 @@ namespace Mordor {
 class CounterStream : public FilterStream
 {
 public:
-    typedef boost::shared_ptr<CounterStream> ptr;
+    typedef std::shared_ptr<CounterStream> ptr;
 
 public:
     CounterStream(Stream::ptr parent, bool own = true)

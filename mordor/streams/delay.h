@@ -10,7 +10,7 @@ namespace Mordor {
 class DelayStream: public FilterStream
 {
 public:
-    typedef boost::shared_ptr<DelayStream> ptr;
+    typedef std::shared_ptr<DelayStream> ptr;
 
     DelayStream(Stream::ptr parent, TimerManager * mgr = NULL,
             unsigned long long delay = 0ull, bool own = true):

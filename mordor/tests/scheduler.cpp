@@ -522,14 +522,14 @@ namespace {
         ~DummyClass() { Scheduler::yield(); }
     };
 
-    static void fun(boost::shared_ptr<DummyClass> a) {}
+    static void fun(std::shared_ptr<DummyClass> a) {}
 }
 
 MORDOR_UNITTEST(Scheduler, allowYieldInDestructor)
 {
     WorkerPool pool(2, true);
-    pool.schedule(boost::bind(fun, boost::shared_ptr<DummyClass>(new DummyClass)));
+    pool.schedule(boost::bind(fun, std::shared_ptr<DummyClass>(new DummyClass)));
     pool.schedule(Fiber::ptr(
-            new Fiber(boost::bind(fun, boost::shared_ptr<DummyClass>(new DummyClass)))));
+            new Fiber(boost::bind(fun, std::shared_ptr<DummyClass>(new DummyClass)))));
     pool.stop();
 }

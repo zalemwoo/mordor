@@ -46,10 +46,10 @@ ClientConnection::ClientConnection(Stream::ptr stream, TimerManager *timerManage
 
     if (timerManager) {
         FilterStream::ptr previous;
-        FilterStream::ptr filter = boost::dynamic_pointer_cast<FilterStream>(m_stream);
+        FilterStream::ptr filter = std::dynamic_pointer_cast<FilterStream>(m_stream);
         while (filter) {
             previous = filter;
-            filter = boost::dynamic_pointer_cast<FilterStream>(filter->parent());
+            filter = std::dynamic_pointer_cast<FilterStream>(filter->parent());
         }
         // Put the timeout stream as close to the actual source stream as
         // possible, to avoid registering timeouts for stuff that's going to
@@ -474,9 +474,9 @@ void ClientRequest::RequestLogger::logResponse(size_t connNum, long long request
     }
 }
 
-/* static */ boost::shared_ptr<ClientRequest::RequestLogger> ClientRequest::msp_requestLogger( new ClientRequest::RequestLogger );
+/* static */ std::shared_ptr<ClientRequest::RequestLogger> ClientRequest::msp_requestLogger( new ClientRequest::RequestLogger );
 
-void ClientRequest::setRequestLogger(boost::shared_ptr<ClientRequest::RequestLogger> newRequestLogger)
+void ClientRequest::setRequestLogger(std::shared_ptr<ClientRequest::RequestLogger> newRequestLogger)
 {
     if (newRequestLogger)
         msp_requestLogger = newRequestLogger;
@@ -719,7 +719,7 @@ ClientRequest::cancel(bool abort, bool error)
         if (filter->parent().get() != &NullStream::get()) {
             // Break the circular reference
             NotifyStream::ptr notify =
-                boost::dynamic_pointer_cast<NotifyStream>(m_requestStream);
+                std::dynamic_pointer_cast<NotifyStream>(m_requestStream);
             MORDOR_ASSERT(notify);
             notify->notifyOnClose(NULL);
             notify->notifyOnEof = NULL;
@@ -733,7 +733,7 @@ ClientRequest::cancel(bool abort, bool error)
         // notify may be holding the last reference to this, so keep ourself in scope
         self = shared_from_this();
         NotifyStream::ptr notify =
-            boost::dynamic_pointer_cast<NotifyStream>(responseStream);
+            std::dynamic_pointer_cast<NotifyStream>(responseStream);
         MORDOR_ASSERT(notify);
         notify->notifyOnClose(NULL);
         notify->notifyOnEof = NULL;
@@ -1208,7 +1208,7 @@ ClientRequest::requestDone()
     MORDOR_LOG_TRACE(g_log) << m_conn->m_connectionNumber << "-" << m_requestNumber << " request complete";
     // Break the circular reference
     NotifyStream::ptr notify =
-        boost::dynamic_pointer_cast<NotifyStream>(m_requestStream);
+        std::dynamic_pointer_cast<NotifyStream>(m_requestStream);
     MORDOR_ASSERT(notify);
     notify->notifyOnClose(NULL);
     notify->notifyOnEof = NULL;
@@ -1235,7 +1235,7 @@ ClientRequest::requestFailed()
     if (m_requestStream) {
         // Break the circular reference
         NotifyStream::ptr notify =
-            boost::dynamic_pointer_cast<NotifyStream>(m_requestStream);
+            std::dynamic_pointer_cast<NotifyStream>(m_requestStream);
         MORDOR_ASSERT(notify);
         notify->notifyOnClose(NULL);
         notify->notifyOnEof = NULL;
@@ -1309,18 +1309,18 @@ ClientRequest::responseDone()
     Stream::ptr stream = m_responseStream.lock();
     MORDOR_ASSERT(stream);
     NotifyStream::ptr notify =
-        boost::dynamic_pointer_cast<NotifyStream>(stream);
+        std::dynamic_pointer_cast<NotifyStream>(stream);
     MORDOR_ASSERT(notify);
     notify->notifyOnClose(NULL);
     notify->notifyOnEof = NULL;
     notify->notifyOnException = NULL;
     // Make sure every stream in the stack gets a proper EOF
     FilterStream::ptr filter =
-        boost::dynamic_pointer_cast<FilterStream>(notify->parent());
+        std::dynamic_pointer_cast<FilterStream>(notify->parent());
     Stream::ptr chunked, limited;
     while (filter && !chunked && !limited) {
-        chunked = boost::dynamic_pointer_cast<ChunkedStream>(filter);
-        limited = boost::dynamic_pointer_cast<LimitedStream>(filter);
+        chunked = std::dynamic_pointer_cast<ChunkedStream>(filter);
+        limited = std::dynamic_pointer_cast<LimitedStream>(filter);
         //redmine issue #86223
         try {
             transferStream(filter, NullStream::get());
@@ -1328,7 +1328,7 @@ ClientRequest::responseDone()
         catch( ... ) {
             MORDOR_LOG_TRACE(g_log) << "Ignoring exception";
         }
-        filter = boost::dynamic_pointer_cast<FilterStream>(filter->parent());
+        filter = std::dynamic_pointer_cast<FilterStream>(filter->parent());
     }
     if (!m_response.general.transferEncoding.empty()) {
         // Read and parse the trailer

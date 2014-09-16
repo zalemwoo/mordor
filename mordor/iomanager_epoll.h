@@ -34,7 +34,7 @@ private:
         {
             EventContext() : scheduler(NULL) {}
             Scheduler *scheduler;
-            boost::shared_ptr<Fiber> fiber;
+            std::shared_ptr<Fiber> fiber;
             boost::function<void ()> dg;
         };
 

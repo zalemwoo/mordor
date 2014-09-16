@@ -11,8 +11,7 @@
 #include <syslog.h>
 #endif
 
-#include <boost/bind.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 
 #include "assert.h"
 #include "fiber.h"
@@ -89,52 +88,52 @@ static struct LogInitializer
 }
 
 static void enableLogger(Logger::ptr logger,
-    const boost::regex &errorRegex, const boost::regex &warnRegex,
-    const boost::regex &infoRegex, const boost::regex &verboseRegex,
-    const boost::regex &debugRegex, const boost::regex &traceRegex)
+    const std::regex &errorRegex, const std::regex &warnRegex,
+    const std::regex &infoRegex, const std::regex &verboseRegex,
+    const std::regex &debugRegex, const std::regex &traceRegex)
 {
     Log::Level level = Log::FATAL;
-    if (boost::regex_match(logger->name(), errorRegex))
+    if (std::regex_match(logger->name(), errorRegex))
         level = Log::ERROR;
-    if (boost::regex_match(logger->name(), warnRegex))
+    if (std::regex_match(logger->name(), warnRegex))
         level = Log::WARNING;
-    if (boost::regex_match(logger->name(), infoRegex))
+    if (std::regex_match(logger->name(), infoRegex))
         level = Log::INFO;
-    if (boost::regex_match(logger->name(), verboseRegex))
+    if (std::regex_match(logger->name(), verboseRegex))
         level = Log::VERBOSE;
-    if (boost::regex_match(logger->name(), debugRegex))
+    if (std::regex_match(logger->name(), debugRegex))
         level = Log::DEBUG;
-    if (boost::regex_match(logger->name(), traceRegex))
+    if (std::regex_match(logger->name(), traceRegex))
         level = Log::TRACE;
 
     if (logger->level() != level)
         logger->level(level, false);
 }
 
-static boost::regex buildLogRegex(const std::string &exp, const std::string &default_exp)
+static std::regex buildLogRegex(const std::string &exp, const std::string &default_exp)
 {
     try
     {
-        return boost::regex(exp);
+        return std::regex(exp);
     }
     catch(boost::bad_expression &)
     {
-        return boost::regex(default_exp);
+        return std::regex(default_exp);
     }
 }
 
 static void enableLoggers()
 {
-    boost::regex errorRegex = buildLogRegex(g_logError->val(), ".*");
-    boost::regex warnRegex = buildLogRegex(g_logWarn->val(), ".*");
-    boost::regex infoRegex = buildLogRegex(g_logInfo->val(), ".*");
-    boost::regex verboseRegex = buildLogRegex(g_logVerbose->val(), "");
-    boost::regex debugRegex = buildLogRegex(g_logDebug->val(), "");
-    boost::regex traceRegex = buildLogRegex(g_logTrace->val(), "");
-    Log::visit(boost::bind(&enableLogger, _1,
-        boost::cref(errorRegex), boost::cref(warnRegex),
-        boost::cref(infoRegex), boost::cref(verboseRegex),
-        boost::cref(debugRegex), boost::cref(traceRegex)));
+    std::regex errorRegex = buildLogRegex(g_logError->val(), ".*");
+    std::regex warnRegex = buildLogRegex(g_logWarn->val(), ".*");
+    std::regex infoRegex = buildLogRegex(g_logInfo->val(), ".*");
+    std::regex verboseRegex = buildLogRegex(g_logVerbose->val(), "");
+    std::regex debugRegex = buildLogRegex(g_logDebug->val(), "");
+    std::regex traceRegex = buildLogRegex(g_logTrace->val(), "");
+    Log::visit(std::bind(&enableLogger, std::placeholders::_1,
+            std::cref(errorRegex), std::cref(warnRegex),
+            std::cref(infoRegex), std::cref(verboseRegex),
+            std::cref(debugRegex), std::cref(traceRegex)));
 }
 
 static void enableStdoutLogging()
@@ -374,7 +373,7 @@ Logger::ptr Log::lookup(const std::string &name)
 }
 
 void
-Log::visit(boost::function<void (boost::shared_ptr<Logger>)> dg)
+Log::visit(std::function<void (std::shared_ptr<Logger>)> dg)
 {
     std::list<Logger::ptr> toVisit;
     toVisit.push_back(root());

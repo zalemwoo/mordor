@@ -30,7 +30,7 @@ ConnectionPool::ConnectionPool(
     try {
         for (size_t i = 0; i < m_total; i++) {
             m_freeConnections.push_back(
-                std::make_pair(boost::shared_ptr<Connection>(
+                std::make_pair(std::shared_ptr<Connection>(
                     new Connection(m_conninfo, m_iomanager, 0, false)), TimerManager::now()));
         }
     } catch(...) {
@@ -52,7 +52,7 @@ bool ConnectionPool::connectionExpired(unsigned long long freeTime) const
     return (m_idleTolerance != 0) && (TimerManager::now() > (freeTime + m_idleTolerance));
 }
 
-boost::shared_ptr<Connection> ConnectionPool::getConnection() {
+std::shared_ptr<Connection> ConnectionPool::getConnection() {
     FiberMutex::ScopedLock lock(m_mutex);
     MORDOR_LOG_DEBUG(g_logger) << "Trying to get connection, pool size is "
                                << m_freeConnections.size();
@@ -60,7 +60,7 @@ boost::shared_ptr<Connection> ConnectionPool::getConnection() {
         MORDOR_LOG_DEBUG(g_logger) << "Trying to creat new connection";
         try {
             m_freeConnections.push_back(
-                std::make_pair(boost::shared_ptr<Connection>(
+                std::make_pair(std::shared_ptr<Connection>(
                     new Connection(m_conninfo, m_iomanager, 0, false)), TimerManager::now()));
         } catch(...) {
             MORDOR_LOG_ERROR(g_logger)
@@ -71,7 +71,7 @@ boost::shared_ptr<Connection> ConnectionPool::getConnection() {
         m_condition.wait();
     }
     MORDOR_ASSERT(!m_freeConnections.empty());
-    boost::shared_ptr<Connection> conn = (*m_freeConnections.begin()).first;
+    std::shared_ptr<Connection> conn = (*m_freeConnections.begin()).first;
 
     // For connection which was pre-allocated in constructor but not connected,
     // its status is CONNECTION_BAD, so we'd always connect it here.
@@ -91,7 +91,7 @@ boost::shared_ptr<Connection> ConnectionPool::getConnection() {
     }
     //The ret is for return value, which has separate counter than
     //the share_ptr stored in m_free/m_busyConnections
-    boost::shared_ptr<Connection> ret(
+    std::shared_ptr<Connection> ret(
         conn.get(),
         boost::bind(&ConnectionPool::releaseConnection, this, _1));
     m_busyConnections.push_back(conn);
@@ -111,8 +111,8 @@ void ConnectionPool::resize(size_t num) {
 void ConnectionPool::releaseConnection(Connection* conn) {
     FiberMutex::ScopedLock lock(m_mutex);
     MORDOR_LOG_DEBUG(g_logger) << "Release connection " << conn;
-    boost::shared_ptr<Connection> c(conn, &nop<Connection*>);
-    std::list<boost::shared_ptr<Connection> >::iterator it
+    std::shared_ptr<Connection> c(conn, &nop<Connection*>);
+    std::list<std::shared_ptr<Connection> >::iterator it
         = std::find(m_busyConnections.begin(), m_busyConnections.end(), c);
     MORDOR_ASSERT(it != m_busyConnections.end());
     c = *it; //This line is necessary,

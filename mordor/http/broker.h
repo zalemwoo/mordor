@@ -26,20 +26,20 @@ class ServerRequest;
 class StreamBroker
 {
 public:
-    typedef boost::shared_ptr<StreamBroker> ptr;
-    typedef boost::weak_ptr<StreamBroker> weak_ptr;
+    typedef std::shared_ptr<StreamBroker> ptr;
+    typedef std::weak_ptr<StreamBroker> weak_ptr;
 
 public:
     virtual ~StreamBroker() {}
 
-    virtual boost::shared_ptr<Stream> getStream(const URI &uri) = 0;
+    virtual std::shared_ptr<Stream> getStream(const URI &uri) = 0;
     virtual void cancelPending() {}
 };
 
 class StreamBrokerFilter : public StreamBroker
 {
 public:
-    typedef boost::shared_ptr<StreamBrokerFilter> ptr;
+    typedef std::shared_ptr<StreamBrokerFilter> ptr;
 
 public:
     StreamBrokerFilter(StreamBroker::ptr parent,
@@ -64,7 +64,7 @@ private:
 class SocketStreamBroker : public StreamBroker
 {
 public:
-    typedef boost::shared_ptr<SocketStreamBroker> ptr;
+    typedef std::shared_ptr<SocketStreamBroker> ptr;
 
 public:
     SocketStreamBroker(IOManager *ioManager = NULL, Scheduler *scheduler = NULL)
@@ -78,27 +78,27 @@ public:
     void connectTimeout(unsigned long long timeout) { m_connectTimeout = timeout; }
 
     // Resolve the uri to its IP address, create a socket, then connect
-    boost::shared_ptr<Stream> getStream(const URI &uri);
+    std::shared_ptr<Stream> getStream(const URI &uri);
     void cancelPending();
 
-    void networkFilterCallback(boost::function<void (boost::shared_ptr<Socket>)> fnCallback)
+    void networkFilterCallback(boost::function<void (std::shared_ptr<Socket>)> fnCallback)
     {  m_filterNetworkCallback = fnCallback; }
 
 private:
     boost::mutex m_mutex;
     bool m_cancelled;
-    std::list<boost::shared_ptr<Socket> > m_pending; // Multiple connections may be attempted when getaddrinfo returns multiple addresses
+    std::list<std::shared_ptr<Socket> > m_pending; // Multiple connections may be attempted when getaddrinfo returns multiple addresses
     IOManager *m_ioManager;
     Scheduler *m_scheduler;
     unsigned long long m_connectTimeout;
-    boost::function<void (boost::shared_ptr<Socket>)> m_filterNetworkCallback;
+    boost::function<void (std::shared_ptr<Socket>)> m_filterNetworkCallback;
 };
 
 class ConnectionBroker
 {
 public:
-    typedef boost::shared_ptr<ConnectionBroker> ptr;
-    typedef boost::weak_ptr<ConnectionBroker> weak_ptr;
+    typedef std::shared_ptr<ConnectionBroker> ptr;
+    typedef std::weak_ptr<ConnectionBroker> weak_ptr;
 
 public:
     ConnectionBroker():
@@ -114,7 +114,7 @@ public:
     {}
     virtual ~ConnectionBroker() {}
 
-    virtual std::pair<boost::shared_ptr<ClientConnection>, bool>
+    virtual std::pair<std::shared_ptr<ClientConnection>, bool>
         getConnection(const URI &uri, bool forceNewConnection = false) = 0;
 
     void httpReadTimeout(unsigned long long timeout) { m_httpReadTimeout = timeout; }
@@ -127,7 +127,7 @@ public:
     void verifySslCertificateHost(bool verify) { m_verifySslCertificateHost = verify; }
 
 protected:
-    void addSSL(const URI &uri, boost::shared_ptr<Stream> &stream);
+    void addSSL(const URI &uri, std::shared_ptr<Stream> &stream);
 
 protected:
     bool m_verifySslCertificate, m_verifySslCertificateHost;
@@ -153,11 +153,11 @@ struct PriorConnectionFailedException : virtual Exception {};
 //
 // Although exposed by createRequestBroker(), normal clients will not manipulate
 // the ConnectionCache directly, apart from calling abortConnections or closeIdleConnections
-class ConnectionCache : public boost::enable_shared_from_this<ConnectionCache>, public ConnectionBroker
+class ConnectionCache : public std::enable_shared_from_this<ConnectionCache>, public ConnectionBroker
 {
 public:
-    typedef boost::shared_ptr<ConnectionCache> ptr;
-    typedef boost::weak_ptr<ConnectionCache> weak_ptr;
+    typedef std::shared_ptr<ConnectionCache> ptr;
+    typedef std::weak_ptr<ConnectionCache> weak_ptr;
 
 protected:
     ConnectionCache(StreamBroker::ptr streamBroker, TimerManager *timerManager = NULL)
@@ -186,12 +186,12 @@ public:
     { m_proxyForURIDg = proxyForURIDg; }
 
     // Required to support HTTPS proxies
-    void proxyRequestBroker(boost::shared_ptr<RequestBroker> broker)
+    void proxyRequestBroker(std::shared_ptr<RequestBroker> broker)
     { m_proxyBroker = broker; }
 
     // Get the connection associated with a URI.  An existing one may be reused,
     // or a new one established.
-    std::pair<boost::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
+    std::pair<std::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
         getConnection(const URI &uri, bool forceNewConnection = false);
 
     void closeIdleConnections();
@@ -202,7 +202,7 @@ public:
     void abortConnections();
 
 private:
-    typedef std::list<boost::shared_ptr<ClientConnection> > ConnectionList;
+    typedef std::list<std::shared_ptr<ClientConnection> > ConnectionList;
 
     // Tracks active connections to a particular host
     // e.g. there might be 5 active connections to http://example.com
@@ -221,12 +221,12 @@ private:
     // Table of active connections for each scheme+host
     // e.g. if a single RequestBroker is connected to two servers at the same time
     // or doing both http and https requests then this will contain multiple entries
-    typedef std::map<URI, boost::shared_ptr<ConnectionInfo> > CachedConnectionMap;
+    typedef std::map<URI, std::shared_ptr<ConnectionInfo> > CachedConnectionMap;
 
 private:
-    std::pair<boost::shared_ptr<ClientConnection>, bool>
+    std::pair<std::shared_ptr<ClientConnection>, bool>
         getConnectionViaProxyFromCache(const URI &uri, const URI &proxy);
-    std::pair<boost::shared_ptr<ClientConnection>, bool>
+    std::pair<std::shared_ptr<ClientConnection>, bool>
         getConnectionViaProxy(const URI &uri, const URI &proxy,
         FiberMutex::ScopedLock &lock);
     void cleanOutDeadConns(CachedConnectionMap &conns);
@@ -240,14 +240,14 @@ private:
     CachedConnectionMap m_conns;
     bool m_closed;
     boost::function<std::vector<URI> (const URI &)> m_proxyForURIDg;
-    boost::shared_ptr<RequestBroker> m_proxyBroker;
+    std::shared_ptr<RequestBroker> m_proxyBroker;
 };
 
 // The ConnectionNoCache has no support for proxies.
 class ConnectionNoCache : public ConnectionBroker
 {
 public:
-    typedef boost::shared_ptr<ConnectionNoCache> ptr;
+    typedef std::shared_ptr<ConnectionNoCache> ptr;
 
     ConnectionNoCache(StreamBroker::ptr streamBroker, TimerManager *timerManager = NULL)
         : m_streamBroker(streamBroker)
@@ -256,7 +256,7 @@ public:
     }
 
     // Get a new connection associated with a URI. Do not cache it.
-    std::pair<boost::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
+    std::pair<std::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
         getConnection(const URI &uri, bool forceNewConnection = false);
 
 private:
@@ -269,11 +269,11 @@ private:
 class MockConnectionBroker : public ConnectionBroker
 {
 private:
-    typedef std::map<URI, boost::shared_ptr<ClientConnection> >
+    typedef std::map<URI, std::shared_ptr<ClientConnection> >
         ConnectionCache; // warning - not the same as class ConnectionCache
 public:
     MockConnectionBroker(boost::function<void (const URI &uri,
-            boost::shared_ptr<ServerRequest>)> dg,
+            std::shared_ptr<ServerRequest>)> dg,
         TimerManager *timerManager = NULL, unsigned long long readTimeout = ~0ull,
         unsigned long long writeTimeout = ~0ull)
         : m_dg(dg)
@@ -281,11 +281,11 @@ public:
         m_timerManager = timerManager;
     }
 
-    std::pair<boost::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
+    std::pair<std::shared_ptr<ClientConnection>, bool /*is proxy connection*/>
         getConnection(const URI &uri, bool forceNewConnection = false);
 
 private:
-    boost::function<void (const URI &uri, boost::shared_ptr<ServerRequest>)> m_dg;
+    boost::function<void (const URI &uri, std::shared_ptr<ServerRequest>)> m_dg;
     ConnectionCache m_conns;
 };
 
@@ -296,8 +296,8 @@ private:
 class RequestBroker
 {
 public:
-    typedef boost::shared_ptr<RequestBroker> ptr;
-    typedef boost::weak_ptr<RequestBroker> weak_ptr;
+    typedef std::shared_ptr<RequestBroker> ptr;
+    typedef std::weak_ptr<RequestBroker> weak_ptr;
 
 public:
     virtual ~RequestBroker() {}
@@ -310,9 +310,9 @@ public:
     // requestHeaders.requestLine.uri, even though the scheme and authority are
     // not sent in the first line of the HTTP request. Also fill in
     // the requestHeaders.request.host.
-    virtual boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    virtual std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL)
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL)
         = 0;
 };
 
@@ -335,9 +335,9 @@ public:
 
     RequestBroker::ptr parent();
 
-    boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL)
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL)
         = 0;
 
 private:
@@ -361,7 +361,7 @@ typedef boost::error_info<struct tag_source, ExceptionSource > errinfo_source;
 class BaseRequestBroker : public RequestBroker
 {
 public:
-    typedef boost::shared_ptr<BaseRequestBroker> ptr;
+    typedef std::shared_ptr<BaseRequestBroker> ptr;
 
 public:
     BaseRequestBroker(ConnectionBroker::ptr connectionBroker)
@@ -371,9 +371,9 @@ public:
         : m_weakConnectionBroker(connectionBroker)
     {}
 
-    boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL);
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL);
 
 private:
     ConnectionBroker::ptr m_connectionBroker;
@@ -384,7 +384,7 @@ private:
 class RetryRequestBroker : public RequestBrokerFilter
 {
 public:
-    typedef boost::shared_ptr<RetryRequestBroker> ptr;
+    typedef std::shared_ptr<RetryRequestBroker> ptr;
 
 public:
     RetryRequestBroker(RequestBroker::ptr parent,
@@ -396,9 +396,9 @@ public:
 
     void sharedRetryCounter(size_t *retries) { mp_retries = retries; }
 
-    boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL);
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL);
 
 private:
     boost::function<bool (size_t)> m_delayDg;
@@ -421,7 +421,7 @@ private:
 class RedirectRequestBroker : public RequestBrokerFilter
 {
 public:
-    typedef boost::shared_ptr<RedirectRequestBroker> ptr;
+    typedef std::shared_ptr<RedirectRequestBroker> ptr;
 
 public:
     RedirectRequestBroker(RequestBroker::ptr parent, size_t maxRedirects = 70)
@@ -436,9 +436,9 @@ public:
     void handleFound(bool handle) { m_handle302 = handle; }
     void handleTemporaryRedirect(bool handle) { m_handle307 = handle; }
 
-    boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL);
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL);
 
 private:
     size_t m_maxRedirects;
@@ -455,9 +455,9 @@ public:
           m_userAgent(userAgent)
     {}
 
-    boost::shared_ptr<ClientRequest> request(Request &requestHeaders,
+    std::shared_ptr<ClientRequest> request(Request &requestHeaders,
         bool forceNewConnection = false,
-        boost::function<void (boost::shared_ptr<ClientRequest>)> bodyDg = NULL);
+        boost::function<void (std::shared_ptr<ClientRequest>)> bodyDg = NULL);
 
 private:
     ProductAndCommentList m_userAgent;
@@ -500,7 +500,7 @@ struct RequestBrokerOptions
 
     // Callback to call directly before a socket connection happens.
     // Implementation should throw an exception if it wants to prevent the connection
-    boost::function<void (boost::shared_ptr<Socket>)> filterNetworksCB;
+    boost::function<void (std::shared_ptr<Socket>)> filterNetworksCB;
 
     bool handleRedirects; // Whether to add a RedirectRequestBroker to the chain of RequestBrokers
     TimerManager *timerManager; // When not specified the iomanager will be used
@@ -524,7 +524,7 @@ struct RequestBrokerOptions
     // request.  An alternative is to add the BasicAuth header before
     // calling RequestBroker::request (see HTTP::BasicAuth::authorize())
     boost::function<bool (const URI &,
-            boost::shared_ptr<ClientRequest> /* priorRequest = ClientRequest::ptr() */,
+            std::shared_ptr<ClientRequest> /* priorRequest = ClientRequest::ptr() */,
             std::string & /* scheme */, std::string & /* realm */,
             std::string & /* username */, std::string & /* password */,
             size_t /* attempts */)>

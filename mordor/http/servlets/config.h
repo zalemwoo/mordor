@@ -25,9 +25,9 @@ public:
         : m_access(access)
     {}
 
-    void request(boost::shared_ptr<ServerRequest> request)
+    void request(std::shared_ptr<ServerRequest> request)
     { return this->request(request, m_access); }
-    void request(boost::shared_ptr<ServerRequest> request, Access access);
+    void request(std::shared_ptr<ServerRequest> request, Access access);
 
 private:
     Access m_access;

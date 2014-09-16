@@ -67,7 +67,7 @@ Scheduler::start()
     MORDOR_ASSERT(m_threads.empty());
     m_threads.resize(m_threadCount);
     for (size_t i = 0; i < m_threadCount; ++i) {
-        m_threads[i] = boost::shared_ptr<Thread>(new Thread(
+        m_threads[i] = std::shared_ptr<Thread>(new Thread(
             boost::bind(&Scheduler::run, this)));
     }
 }
@@ -133,12 +133,12 @@ Scheduler::stop()
         Scheduler::getThis() != this) {
         MORDOR_LOG_DEBUG(g_log) << this
             << " waiting for other threads to stop";
-        std::vector<boost::shared_ptr<Thread> > threads;
+        std::vector<std::shared_ptr<Thread> > threads;
         {
             boost::mutex::scoped_lock lock(m_mutex);
             threads.swap(m_threads);
         }
-        for (std::vector<boost::shared_ptr<Thread> >::const_iterator it
+        for (std::vector<std::shared_ptr<Thread> >::const_iterator it
             (threads.begin());
             it != threads.end();
             ++it) {
@@ -215,7 +215,7 @@ Scheduler::threadCount(size_t threads)
     } else if (threads > m_threadCount) {
         m_threads.resize(threads);
         for (size_t i = m_threadCount; i < threads; ++i)
-            m_threads[i] = boost::shared_ptr<Thread>(new Thread(
+            m_threads[i] = std::shared_ptr<Thread>(new Thread(
             boost::bind(&Scheduler::run, this)));
     }
     m_threadCount = threads;
@@ -273,7 +273,7 @@ Scheduler::run()
                     idleFiber->inject(boost::current_exception());
                 }
                 // Detach our thread
-                for (std::vector<boost::shared_ptr<Thread> >
+                for (std::vector<std::shared_ptr<Thread> >
                     ::iterator it = m_threads.begin();
                     it != m_threads.end();
                     ++it)

@@ -1226,7 +1226,7 @@ Socket::remoteAddress()
     MORDOR_ASSERT(namelen <= result->nameLen());
 #ifndef WINDOWS
     if (m_family == AF_UNIX) {
-        boost::shared_ptr<UnixAddress> addr = boost::dynamic_pointer_cast<UnixAddress>(result);
+        std::shared_ptr<UnixAddress> addr = std::dynamic_pointer_cast<UnixAddress>(result);
         addr->nameLen(namelen);
     }
 #endif
@@ -1262,7 +1262,7 @@ Socket::localAddress()
 #ifndef WINDOWS
     // set the result->nameLen() right
     if (m_family == AF_UNIX) {
-        boost::shared_ptr<UnixAddress> addr = boost::dynamic_pointer_cast<UnixAddress>(result);
+        std::shared_ptr<UnixAddress> addr = std::dynamic_pointer_cast<UnixAddress>(result);
         addr->nameLen(namelen);
     }
 #endif
@@ -1721,7 +1721,7 @@ bool Address::operator!=(const Address &rhs) const
 IPAddress::ptr
 IPAddress::clone()
 {
-    return boost::static_pointer_cast<IPAddress>(Address::clone());
+    return std::static_pointer_cast<IPAddress>(Address::clone());
 }
 
 IPAddress::ptr
@@ -1740,7 +1740,7 @@ IPAddress::create(const char *address, unsigned short port)
         throwGaiException(error);
     }
     try {
-        IPAddress::ptr result = boost::static_pointer_cast<IPAddress>(
+        IPAddress::ptr result = std::static_pointer_cast<IPAddress>(
             Address::create(results->ai_addr, (socklen_t)results->ai_addrlen));
         result->port(port);
         freeaddrinfo(results);
@@ -1793,7 +1793,7 @@ IPv4Address::broadcastAddress(unsigned int prefixLength)
     sockaddr_in baddr(sin);
     baddr.sin_addr.s_addr |= byteswapOnLittleEndian(
         createMask<unsigned int>(prefixLength));
-    return boost::static_pointer_cast<IPv4Address>(
+    return std::static_pointer_cast<IPv4Address>(
         Address::create((const sockaddr *)&baddr, sizeof(sockaddr_in)));
 }
 
@@ -1804,7 +1804,7 @@ IPv4Address::networkAddress(unsigned int prefixLength)
     sockaddr_in baddr(sin);
     baddr.sin_addr.s_addr &= byteswapOnLittleEndian(
         ~createMask<unsigned int>(prefixLength));
-    return boost::static_pointer_cast<IPv4Address>(
+    return std::static_pointer_cast<IPv4Address>(
         Address::create((const sockaddr *)&baddr, sizeof(sockaddr_in)));
 }
 
@@ -1817,7 +1817,7 @@ IPv4Address::createSubnetMask(unsigned int prefixLength)
     subnet.sin_family = AF_INET;
     subnet.sin_addr.s_addr = byteswapOnLittleEndian(
         ~createMask<unsigned int>(prefixLength));
-    return boost::static_pointer_cast<IPv4Address>(
+    return std::static_pointer_cast<IPv4Address>(
         Address::create((const sockaddr *)&subnet, sizeof(sockaddr_in)));
 }
 
@@ -1870,7 +1870,7 @@ IPv6Address::broadcastAddress(unsigned int prefixLength)
         createMask<unsigned char>(prefixLength % 8);
     for (unsigned int i = prefixLength / 8 + 1; i < 16; ++i)
         baddr.sin6_addr.s6_addr[i] = 0xffu;
-    return boost::static_pointer_cast<IPv6Address>(
+    return std::static_pointer_cast<IPv6Address>(
         Address::create((const sockaddr *)&baddr, sizeof(sockaddr_in6)));
 }
 
@@ -1883,7 +1883,7 @@ IPv6Address::networkAddress(unsigned int prefixLength)
         ~createMask<unsigned char>(prefixLength % 8);
     for (unsigned int i = prefixLength / 8 + 1; i < 16; ++i)
         baddr.sin6_addr.s6_addr[i] = 0x00u;
-    return boost::static_pointer_cast<IPv6Address>(
+    return std::static_pointer_cast<IPv6Address>(
         Address::create((const sockaddr *)&baddr, sizeof(sockaddr_in6)));
 }
 
@@ -1898,7 +1898,7 @@ IPv6Address::createSubnetMask(unsigned int prefixLength)
         ~createMask<unsigned char>(prefixLength % 8);
     for (unsigned int i = 0; i < prefixLength / 8; ++i)
         subnet.sin6_addr.s6_addr[i] = 0xffu;
-    return boost::static_pointer_cast<IPv6Address>(
+    return std::static_pointer_cast<IPv6Address>(
         Address::create((const sockaddr *)&subnet, sizeof(sockaddr_in6)));
 }
 

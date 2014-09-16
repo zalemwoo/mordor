@@ -2645,7 +2645,7 @@ namespace {
 class DummyStreamBroker : public StreamBroker
 {
 public:
-    typedef boost::shared_ptr<DummyStreamBroker> ptr;
+    typedef std::shared_ptr<DummyStreamBroker> ptr;
     Stream::ptr getStream(const URI &uri)
     {
         std::pair<Stream::ptr, Stream::ptr> pipe = pipeStream();
@@ -2667,7 +2667,7 @@ static void accept(SSLStream::ptr server)
 class DummySSLStreamBroker : public StreamBroker
 {
 public:
-    typedef boost::shared_ptr<DummyStreamBroker> ptr;
+    typedef std::shared_ptr<DummyStreamBroker> ptr;
     Stream::ptr getStream(const URI &uri)
     {
         std::pair<Stream::ptr, Stream::ptr> pipes = pipeStream();
@@ -2700,7 +2700,7 @@ MORDOR_UNITTEST(HTTPConnectionCache, idleDoesntPreventStop)
 MORDOR_UNITTEST(HTTPConnectionCache, remoteClose)
 {
     IOManager ioManager;
-    boost::weak_ptr<ConnectionCache> weakCache;
+    std::weak_ptr<ConnectionCache> weakCache;
     ServerConnection::ptr serverConn;
     ClientConnection::ptr clientConn;
     {

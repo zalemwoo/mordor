@@ -48,7 +48,7 @@ private:
 class SSLStream : public MutatingFilterStream
 {
 public:
-    typedef boost::shared_ptr<SSLStream> ptr;
+    typedef std::shared_ptr<SSLStream> ptr;
 
 public:
     SSLStream(Stream::ptr parent, bool client = true, bool own = true, SSL_CTX *ctx = NULL);
@@ -77,8 +77,8 @@ private:
 
 private:
     boost::mutex m_mutex;
-    boost::shared_ptr<SSL_CTX> m_ctx;
-    boost::shared_ptr<SSL> m_ssl;
+    std::shared_ptr<SSL_CTX> m_ctx;
+    std::shared_ptr<SSL> m_ssl;
     Buffer m_readBuffer, m_writeBuffer;
     BIO *m_readBio, *m_writeBio;
 };

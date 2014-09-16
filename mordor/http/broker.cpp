@@ -44,14 +44,14 @@ createRequestBroker(const RequestBrokerOptions &options)
     if (!options.enableConnectionCache) {
         ConnectionNoCache::ptr connectionNoCache(new ConnectionNoCache(streamBroker,
             timerManager));
-        connectionBroker = boost::static_pointer_cast<ConnectionBroker>(connectionNoCache);
+        connectionBroker = std::static_pointer_cast<ConnectionBroker>(connectionNoCache);
     } else {
         connectionCache = ConnectionCache::create(streamBroker, timerManager);
         connectionCache->idleTimeout(options.idleTimeout);
         connectionCache->proxyForURI(options.proxyForURIDg);
         connectionCache->proxyRequestBroker(options.proxyRequestBroker);
         connectionCache->connectionsPerHost(options.connectionsPerHost);
-        connectionBroker = boost::static_pointer_cast<ConnectionBroker>(connectionCache);
+        connectionBroker = std::static_pointer_cast<ConnectionBroker>(connectionCache);
     }
     connectionBroker->httpReadTimeout(options.httpReadTimeout);
     connectionBroker->httpWriteTimeout(options.httpWriteTimeout);
@@ -313,7 +313,7 @@ ConnectionCache::getConnectionViaProxyFromCache(const URI &uri, const URI &proxy
         if (it != m_conns.end() &&
             !it->second->connections.empty() &&
             it->second->connections.size() >= m_connectionsPerHost) {
-            boost::shared_ptr<ConnectionInfo> info = it->second;
+            std::shared_ptr<ConnectionInfo> info = it->second;
             ConnectionList &connsForThisUri = info->connections;
             // Assign it2 to point to the connection with the
             // least number of outstanding requests
@@ -361,7 +361,7 @@ ConnectionCache::getConnectionViaProxy(const URI &uri, const URI &proxy,
 
     // Make sure we have a ConnectionList and mutex for this endpoint
     CachedConnectionMap::iterator it = m_conns.find(endpoint);
-    boost::shared_ptr<ConnectionInfo> info;
+    std::shared_ptr<ConnectionInfo> info;
     if (it == m_conns.end()) {
         info.reset(new ConnectionInfo(m_mutex));
         it = m_conns.insert(std::make_pair(endpoint, info)).first;
@@ -636,7 +636,7 @@ ConnectionCache::getActiveConnections()
     CachedConnectionMap::iterator it;
     ConnectionList::iterator it2;
     for (it = m_conns.begin(); it != m_conns.end(); it++) {
-        boost::shared_ptr<ConnectionInfo> info = it->second;
+        std::shared_ptr<ConnectionInfo> info = it->second;
         tmpCount = 0;
         for (it2 = info->connections.begin();
             it2 != info->connections.end();

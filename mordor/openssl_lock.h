@@ -35,7 +35,7 @@ public:
     void uninstallLockCallBacks();
 
 protected:
-    typedef std::vector<boost::shared_ptr<LockType> > Locks;
+    typedef std::vector<std::shared_ptr<LockType> > Locks;
 
     OpensslLockManager();
     ~OpensslLockManager();
@@ -43,7 +43,7 @@ protected:
     void locking(int mode, int n, const char * file, int line);
 
 protected:
-    std::vector<boost::shared_ptr<LockType> > m_locks;
+    std::vector<std::shared_ptr<LockType> > m_locks;
     bool m_initialized;
 };
 

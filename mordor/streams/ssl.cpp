@@ -84,8 +84,8 @@ CertificateVerificationException::constructMessage(long verifyResult)
 // Adapted from https://www.codeblog.org/viewsrc/openssl-fips-1.1.1/demos/x509/mkcert.c
 static void add_ext(X509 *cert, int nid, const char *value);
 
-static void mkcert(boost::shared_ptr<X509> &cert,
-                  boost::shared_ptr<EVP_PKEY> &pkey, int bits, int serial,
+static void mkcert(std::shared_ptr<X509> &cert,
+                  std::shared_ptr<EVP_PKEY> &pkey, int bits, int serial,
                   int days)
 {
     RSA *rsa;
@@ -178,8 +178,8 @@ SSLStream::SSLStream(Stream::ptr parent, bool client, bool own, SSL_CTX *ctx)
     }
     // Auto-generate self-signed server cert
     if (!ctx && !client) {
-        boost::shared_ptr<X509> cert;
-        boost::shared_ptr<EVP_PKEY> pkey;
+        std::shared_ptr<X509> cert;
+        std::shared_ptr<EVP_PKEY> pkey;
         mkcert(cert, pkey, 1024, rand(), 365);
         SSL_CTX_use_certificate(m_ctx.get(), cert.get());
         SSL_CTX_use_PrivateKey(m_ctx.get(), pkey.get());
@@ -666,7 +666,7 @@ SSLStream::verifyPeerCertificate(const std::string &hostname)
         size_t dot = hostname.find('.');
         if (dot != std::string::npos)
             wildcardHostname.append(hostname.substr(dot));
-        boost::shared_ptr<X509> cert;
+        std::shared_ptr<X509> cert;
         cert.reset(SSL_get_peer_certificate(m_ssl.get()), &X509_free);
         if (!cert)
             MORDOR_THROW_EXCEPTION(CertificateVerificationException(

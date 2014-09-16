@@ -69,7 +69,7 @@ Document::ptr XMLParser::loadDocument(const Buffer& buffer) {
 Document::ptr XMLParser::loadDocument(Stream& stream) {
     PARSE_DOC(stream)
 }
-Document::ptr XMLParser::loadDocument(boost::shared_ptr<Stream> stream) {
+Document::ptr XMLParser::loadDocument(std::shared_ptr<Stream> stream) {
     PARSE_DOC(*stream)
 }
 

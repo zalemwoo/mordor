@@ -29,7 +29,7 @@ struct Buffer;
 class Stream : boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<Stream> ptr;
+    typedef std::shared_ptr<Stream> ptr;
 
     /// Flags for which end of a Stream to close
     enum CloseType {

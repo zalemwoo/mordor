@@ -16,7 +16,7 @@ namespace
     class EmptyTimeClass
     {
     public:
-        typedef boost::shared_ptr<EmptyTimeClass> ptr;
+        typedef std::shared_ptr<EmptyTimeClass> ptr;
     public:
         EmptyTimeClass()
             : m_timedOut(false)
@@ -139,7 +139,7 @@ MORDOR_UNITTEST(IOManager, tickleDeadlock)
     tid_t tidA = manager.rootThreadId();
     tid_t tidB = 0;
     {
-        const std::vector<boost::shared_ptr<Thread> > threads =
+        const std::vector<std::shared_ptr<Thread> > threads =
             manager.threads();
         MORDOR_TEST_ASSERT_EQUAL(threads.size(), 1U);
         tidB = threads[0]->tid();

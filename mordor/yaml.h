@@ -39,7 +39,7 @@ private:
 
 JSON::Value parse(const std::string &string);
 JSON::Value parse(Stream &stream);
-JSON::Value parse(boost::shared_ptr<Stream> stream);
+JSON::Value parse(std::shared_ptr<Stream> stream);
 
 }}
 

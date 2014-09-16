@@ -10,7 +10,7 @@ namespace Mordor {
 
 class Stream;
 
-std::pair<boost::shared_ptr<Stream>, boost::shared_ptr<Stream> >
+std::pair<std::shared_ptr<Stream>, std::shared_ptr<Stream> >
     pipeStream(size_t bufferSize = ~0);
 
 }

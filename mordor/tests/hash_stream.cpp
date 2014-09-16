@@ -113,7 +113,7 @@ MORDOR_UNITTEST(SHA256Stream, resumeShaCtx)
     HashStream::ptr tempStream(new SHA256Stream(NullStream::get_ptr()));
     std::string data("The quick brown fox jumps over the lazy dog");
     tempStream->write(data, data.size());
-    SHA256_CTX ctx = boost::static_pointer_cast<SHA256Stream>(tempStream)->ctx();
+    SHA256_CTX ctx = std::static_pointer_cast<SHA256Stream>(tempStream)->ctx();
     tempStream.reset();
 
     HashStream::ptr hashStream(new SHA256Stream(NullStream::get_ptr(), ctx));

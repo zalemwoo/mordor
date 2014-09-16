@@ -69,11 +69,11 @@ struct TimedOutException : virtual SocketException {};
 
 struct Address;
 
-class Socket : public boost::enable_shared_from_this<Socket>, boost::noncopyable
+class Socket : public std::enable_shared_from_this<Socket>, boost::noncopyable
 {
 public:
-    typedef boost::shared_ptr<Socket> ptr;
-    typedef boost::weak_ptr<Socket> weak_ptr;
+    typedef std::shared_ptr<Socket> ptr;
+    typedef std::weak_ptr<Socket> weak_ptr;
 private:
     Socket(IOManager *ioManager, int family, int type, int protocol, int initialize);
 public:
@@ -87,9 +87,9 @@ public:
     void sendTimeout(unsigned long long us) { m_sendTimeout = us; }
 
     void bind(const Address &addr);
-    void bind(const boost::shared_ptr<Address> addr);
+    void bind(const std::shared_ptr<Address> addr);
     void connect(const Address &to);
-    void connect(const boost::shared_ptr<Address> addr)
+    void connect(const std::shared_ptr<Address> addr)
     { connect(*addr.get()); }
     void listen(int backlog = SOMAXCONN);
 
@@ -120,10 +120,10 @@ public:
     size_t send(const void *buffer, size_t length, int flags = 0);
     size_t send(const iovec *buffers, size_t length, int flags = 0);
     size_t sendTo(const void *buffer, size_t length, int flags, const Address &to);
-    size_t sendTo(const void *buffer, size_t length, int flags, const boost::shared_ptr<Address> to)
+    size_t sendTo(const void *buffer, size_t length, int flags, const std::shared_ptr<Address> to)
     { return sendTo(buffer, length, flags, *to.get()); }
     size_t sendTo(const iovec *buffers, size_t length, int flags, const Address &to);
-    size_t sendTo(const iovec *buffers, size_t length, int flags, const boost::shared_ptr<Address> to)
+    size_t sendTo(const iovec *buffers, size_t length, int flags, const std::shared_ptr<Address> to)
     { return sendTo(buffers, length, flags, *to.get()); }
 
     size_t receive(void *buffer, size_t length, int *flags = NULL);
@@ -131,9 +131,9 @@ public:
     size_t receiveFrom(void *buffer, size_t length, Address &from, int *flags = NULL);
     size_t receiveFrom(iovec *buffers, size_t length, Address &from, int *flags = NULL);
 
-    boost::shared_ptr<Address> emptyAddress();
-    boost::shared_ptr<Address> remoteAddress();
-    boost::shared_ptr<Address> localAddress();
+    std::shared_ptr<Address> emptyAddress();
+    std::shared_ptr<Address> remoteAddress();
+    std::shared_ptr<Address> localAddress();
 
     int family() { return m_family; }
     int type();
@@ -168,13 +168,13 @@ private:
     IOManager *m_ioManager;
     unsigned long long m_receiveTimeout, m_sendTimeout;
     error_t m_cancelledSend, m_cancelledReceive;
-    boost::shared_ptr<Address> m_localAddress, m_remoteAddress;
+    std::shared_ptr<Address> m_localAddress, m_remoteAddress;
 #ifdef WINDOWS
     bool m_skipCompletionPortOnSuccess;
     // All this, just so a connect/accept can be cancelled on win2k
     bool m_unregistered;
     HANDLE m_hEvent;
-    boost::shared_ptr<Fiber> m_fiber;
+    std::shared_ptr<Fiber> m_fiber;
     Scheduler *m_scheduler;
 
     AsyncEvent m_sendEvent, m_receiveEvent;
@@ -202,7 +202,7 @@ struct HostNotFoundException : virtual NameLookupException {};
 struct Address
 {
 public:
-    typedef boost::shared_ptr<Address> ptr;
+    typedef std::shared_ptr<Address> ptr;
 protected:
     Address() {}
 public:
@@ -239,7 +239,7 @@ public:
 struct IPAddress : public Address
 {
 public:
-    typedef boost::shared_ptr<IPAddress> ptr;
+    typedef std::shared_ptr<IPAddress> ptr;
 
 public:
     /// Create an IPAddress from a numeric string
