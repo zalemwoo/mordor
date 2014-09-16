@@ -66,11 +66,11 @@ unsigned long long stringToMicroseconds(const std::string &string);
 namespace detail
 {
     template <class T>
-    typename boost::enable_if_c<sizeof(T) == 2, wchar_t>::type utf16func();
+    typename std::enable_if<sizeof(T) == 2, wchar_t>::type utf16func();
     template <class T>
     typename boost::disable_if_c<sizeof(T) == 2, unsigned short>::type utf16func();
     template <class T>
-    typename boost::enable_if_c<sizeof(T) == 4, wchar_t>::type utf32func();
+    typename std::enable_if<sizeof(T) == 4, wchar_t>::type utf32func();
     template <class T>
     typename boost::disable_if_c<sizeof(T) == 4, unsigned int>::type utf32func();
 };

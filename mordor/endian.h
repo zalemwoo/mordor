@@ -2,8 +2,6 @@
 #define __MORDOR_ENDIAN_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
-#include <boost/utility/enable_if.hpp>
-
 #include "version.h"
 
 #define MORDOR_LITTLE_ENDIAN 1
@@ -28,19 +26,19 @@ namespace Mordor {
 #ifdef WINDOWS
 
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(unsigned __int64), T>::type
+typename std::enable_if<sizeof(T) == sizeof(unsigned __int64), T>::type
 byteswap(T value)
 {
     return (T)_byteswap_uint64((unsigned __int64)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(unsigned long), T>::type
+typename std::enable_if<sizeof(T) == sizeof(unsigned long), T>::type
 byteswap(T value)
 {
     return (T)_byteswap_ulong((unsigned long)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(unsigned short), T>::type
+typename std::enable_if<sizeof(T) == sizeof(unsigned short), T>::type
 byteswap(T value)
 {
     return (T)_byteswap_ushort((unsigned short)value);
@@ -51,19 +49,19 @@ byteswap(T value)
 #elif defined(OSX)
 
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint64_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint64_t), T>::type
 byteswap(T value)
 {
     return (T)_OSSwapInt64((uint64_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint32_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint32_t), T>::type
 byteswap(T value)
 {
     return (T)_OSSwapInt32((uint32_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint16_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint16_t), T>::type
 byteswap(T value)
 {
     return (T)_OSSwapInt16((uint16_t)value);
@@ -82,19 +80,19 @@ byteswap(T value)
 #elif defined(FREEBSD)
 
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint64_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint64_t), T>::type
 byteswap(T value)
 {
     return (T)bswap64((uint64_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint32_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint32_t), T>::type
 byteswap(T value)
 {
     return (T)bswap32((uint32_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint16_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint16_t), T>::type
 byteswap(T value)
 {
     return (T)bswap16((uint16_t)value);
@@ -109,19 +107,19 @@ byteswap(T value)
 #else
 
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint64_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint64_t), T>::type
 byteswap(T value)
 {
     return (T)bswap_64((uint64_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint32_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint32_t), T>::type
 byteswap(T value)
 {
     return (T)bswap_32((uint32_t)value);
 }
 template <class T>
-typename boost::enable_if_c<sizeof(T) == sizeof(uint16_t), T>::type
+typename std::enable_if<sizeof(T) == sizeof(uint16_t), T>::type
 byteswap(T value)
 {
     return (T)bswap_16((uint16_t)value);

@@ -15,7 +15,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/noncopyable.hpp>
-// #include <boost/shared_ptr.hpp> // Z
 #include <boost/signals2/signal.hpp>
 
 #include "assert.h"

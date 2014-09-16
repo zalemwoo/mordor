@@ -42,7 +42,7 @@ public:
 #endif
     }
 
-    typename boost::enable_if_c<sizeof(T) <= sizeof(void *)>::type set(const T &t)
+    typename std::enable_if<sizeof(T) <= sizeof(void *)>::type set(const T &t)
     {
 #ifdef WINDOWS
         if (!TlsSetValue(m_key, (LPVOID)t))

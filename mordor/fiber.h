@@ -4,10 +4,7 @@
 
 #include <list>
 
-#include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
-//#include <boost/thread/mutex.hpp>
 
 #include "exception.h"
 #include "thread_local_storage.h"
@@ -218,7 +215,7 @@ public:
         Fiber::flsFree(m_key);
     }
 
-    typename boost::enable_if_c<sizeof(T) <= sizeof(intptr_t)>::type set(const T &t)
+    typename std::enable_if<sizeof(T) <= sizeof(intptr_t)>::type set(const T &t)
     {
         Fiber::flsSet(m_key, (intptr_t)t);
     }

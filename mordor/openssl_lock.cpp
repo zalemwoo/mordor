@@ -22,11 +22,11 @@ namespace {
 // NOTE: On any platform, only one of following two template functions will be
 // enabled. And the first one is applicable on most platform.
 template <class T>
-typename boost::enable_if_c<sizeof(T) >= sizeof(void *), T>::type
+typename std::enable_if<sizeof(T) >= sizeof(void *), T>::type
 pointer2integer(void * p) { return (T) p; }
 
 template <class T>
-typename boost::enable_if_c<sizeof(T) < sizeof(void *), T>::type
+typename std::enable_if<sizeof(T) < sizeof(void *), T>::type
 pointer2integer(void *p)
 {
     static const T mask = (T) -1;
