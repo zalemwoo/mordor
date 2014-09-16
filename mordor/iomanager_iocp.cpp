@@ -14,7 +14,7 @@ namespace Mordor {
 static Logger::ptr g_log = Log::lookup("mordor:iomanager");
 static Logger::ptr g_logWaitBlock = Log::lookup("mordor:iomanager:waitblock");
 
-boost::mutex IOManager::m_errorMutex;
+std::mutex IOManager::m_errorMutex;
 size_t IOManager::m_iocpAllowedErrorCount = 0;
 size_t IOManager::m_iocpErrorCountWindowInSeconds = 0;
 size_t IOManager::m_errorCount = 0;
@@ -57,10 +57,10 @@ IOManager::WaitBlock::~WaitBlock()
 
 bool
 IOManager::WaitBlock::registerEvent(HANDLE hEvent,
-                                        boost::function <void ()> dg,
+                                        std::function <void ()> dg,
                                         bool recurring)
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_inUseCount == -1 || m_inUseCount == MAXIMUM_WAIT_OBJECTS - 1)
         return false;
     ++m_inUseCount;
@@ -81,11 +81,11 @@ IOManager::WaitBlock::registerEvent(HANDLE hEvent,
     return true;
 }
 
-typedef boost::function<void ()> functor;
+typedef std::function<void ()> functor;
 size_t
 IOManager::WaitBlock::unregisterEvent(HANDLE handle)
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_inUseCount == -1)
         return 0;
     size_t unregistered = 0;
@@ -124,7 +124,7 @@ IOManager::WaitBlock::run()
     HANDLE handles[MAXIMUM_WAIT_OBJECTS];
 
     {
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         if (m_inUseCount == -1) {
             // The first/final handle was unregistered out from under us
             // before we could even start
@@ -144,7 +144,7 @@ IOManager::WaitBlock::run()
             << "): " << dwRet << " (" << lastError() << ")";
         if (dwRet == WAIT_OBJECT_0) {
             // Array just got reconfigured
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             if (!SetEvent(m_reconfigured))
                 MORDOR_THROW_EXCEPTION_FROM_LAST_ERROR_API("SetEvent");
             if (m_inUseCount == -1)
@@ -153,7 +153,7 @@ IOManager::WaitBlock::run()
             memcpy(handles, m_handles, (count) * sizeof(HANDLE));
             MORDOR_LOG_DEBUG(g_logWaitBlock) << this << " reconfigure " << count;
         } else if (dwRet >= WAIT_OBJECT_0 + 1 && dwRet < WAIT_OBJECT_0 + MAXIMUM_WAIT_OBJECTS) {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
 
             if (m_inUseCount == -1) {
                 // The final handle was unregistered out from under us
@@ -192,7 +192,7 @@ IOManager::WaitBlock::run()
     MORDOR_LOG_DEBUG(g_logWaitBlock) << this << " done";
     {
         ptr self = shared_from_this();
-        boost::mutex::scoped_lock lock(m_outer.m_mutex);
+        std::lock_guard<std::mutex> lock(m_outer.m_mutex);
         std::list<WaitBlock::ptr>::iterator it =
             std::find(m_outer.m_waitBlocks.begin(), m_outer.m_waitBlocks.end(),
                 shared_from_this());
@@ -209,8 +209,8 @@ IOManager::WaitBlock::removeEntry(int index)
     memmove(&m_schedulers[index], &m_schedulers[index + 1], (m_inUseCount - index) * sizeof(Scheduler *));
     // Manually destruct old object, move others down, and default construct unused one
     m_dgs[index].~functor();
-    memmove(&m_dgs[index], &m_dgs[index + 1], (m_inUseCount - index) * sizeof(boost::function<void ()>));
-    new(&m_dgs[m_inUseCount]) boost::function<void ()>();
+    memmove(&m_dgs[index], &m_dgs[index + 1], (m_inUseCount - index) * sizeof(std::function<void ()>));
+    new(&m_dgs[m_inUseCount]) std::function<void ()>();
     // Manually destruct old object, move others down, and default construct unused one
     m_fibers[index].~shared_ptr<Fiber>();
     memmove(&m_fibers[index], &m_fibers[index + 1], (m_inUseCount - index) * sizeof(Fiber::ptr));
@@ -277,7 +277,7 @@ IOManager::registerEvent(AsyncEvent *e)
     MORDOR_LOG_DEBUG(g_log) << this << " registerEvent(" << &e->overlapped << ")";
 #ifndef NDEBUG
     {
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         MORDOR_ASSERT(m_pendingEvents.find(&e->overlapped) == m_pendingEvents.end());
         m_pendingEvents[&e->overlapped] = e;
 #endif
@@ -298,7 +298,7 @@ IOManager::unregisterEvent(AsyncEvent *e)
     e->m_fiber.reset();
 #ifndef NDEBUG
     {
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         std::map<OVERLAPPED *, AsyncEvent *>::iterator it =
             m_pendingEvents.find(&e->overlapped);
         MORDOR_ASSERT(it != m_pendingEvents.end());
@@ -312,7 +312,7 @@ IOManager::unregisterEvent(AsyncEvent *e)
 }
 
 void
-IOManager::registerEvent(HANDLE handle, boost::function<void ()> dg, bool recurring)
+IOManager::registerEvent(HANDLE handle, std::function<void ()> dg, bool recurring)
 {
     MORDOR_LOG_DEBUG(g_log) << this << " registerEvent(" << handle << ", " << dg
         << ")";
@@ -320,7 +320,7 @@ IOManager::registerEvent(HANDLE handle, boost::function<void ()> dg, bool recurr
     MORDOR_ASSERT(handle != INVALID_HANDLE_VALUE);
     MORDOR_ASSERT(Scheduler::getThis());
 
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     for (std::list<WaitBlock::ptr>::iterator it = m_waitBlocks.begin();
         it != m_waitBlocks.end();
         ++it) {
@@ -336,7 +336,7 @@ size_t
 IOManager::unregisterEvent(HANDLE handle)
 {
     MORDOR_ASSERT(handle);
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     size_t result = 0;
     for (std::list<WaitBlock::ptr>::iterator it = m_waitBlocks.begin();
         it != m_waitBlocks.end();
@@ -391,7 +391,7 @@ IOManager::stopping(unsigned long long &nextTimeout)
     if (nextTimeout == ~0ull && Scheduler::stopping()) {
         if (m_pendingEventCount != 0)
             return false;
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         return m_waitBlocks.empty();
     }
     return false;
@@ -430,7 +430,7 @@ IOManager::idle()
             if (error == WAIT_TIMEOUT) {
                 // No tickles or AsyncIO calls have happened so check for timers
                 // that need execution
-                std::vector<boost::function<void ()> > expired = processTimers();
+                std::vector<std::function<void ()> > expired = processTimers();
                 if (!expired.empty()) {
                     schedule(expired.begin(), expired.end());
                     expired.clear();
@@ -447,14 +447,14 @@ IOManager::idle()
         }
 
         // Schedule any timers that are ready to execute
-        std::vector<boost::function<void ()> > expired = processTimers();
+        std::vector<std::function<void ()> > expired = processTimers();
         if (!expired.empty()) {
             schedule(expired.begin(), expired.end());
             expired.clear();
         }
 
 #ifndef NDEBUG
-        boost::mutex::scoped_lock lock(m_mutex, boost::defer_lock_t());
+        std::lock_guard<std::mutex> lock(m_mutex, boost::defer_lock_t());
 #endif
         int tickles = 0;
         for (ULONG i = 0; i < count; ++i) {
@@ -519,7 +519,7 @@ IOManager::idle()
 
 void IOManager::setIOCPErrorTolerance(size_t count, size_t seconds)
 {
-    boost::mutex::scoped_lock lock(m_errorMutex);
+    std::lock_guard<std::mutex> lock(m_errorMutex);
     m_iocpAllowedErrorCount = count;
     m_iocpErrorCountWindowInSeconds = seconds;
 }
@@ -536,7 +536,7 @@ IOManager::tickle()
         << ", 0, ~0, NULL): " << bRet << " (" << (bRet ? ERROR_SUCCESS : lastError()) << ")";
 
     if (!bRet) {
-        boost::mutex::scoped_lock lock(m_errorMutex);
+        std::lock_guard<std::mutex> lock(m_errorMutex);
 
         if (m_iocpAllowedErrorCount != 0) {
             unsigned long long currentTime = Mordor::TimerManager::now() / 1000ULL;

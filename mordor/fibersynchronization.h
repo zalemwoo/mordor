@@ -3,10 +3,9 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <list>
+#include <mutex>
 
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 namespace Mordor {
 
@@ -97,7 +96,7 @@ private:
     void unlockNoLock();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::shared_ptr<Fiber> m_owner;
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
@@ -130,7 +129,7 @@ private:
     void unlockNoLock();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::shared_ptr<Fiber> m_owner;
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
     unsigned m_recursion;
@@ -159,7 +158,7 @@ public:
     void notify();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
     size_t m_concurrency;
 };
@@ -193,7 +192,7 @@ public:
     void broadcast();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     FiberMutex &m_fiberMutex;
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
@@ -224,7 +223,7 @@ public:
     void reset();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     bool m_signalled;
     const bool m_autoReset;
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;

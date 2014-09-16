@@ -82,7 +82,7 @@ ClientConnection::request(const Request &requestHeaders)
 bool
 ClientConnection::newRequestsAllowed()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_allowNewRequests && m_priorResponseClosed == ~0ull &&
         !m_priorRequestFailed && m_priorResponseFailed == ~0ull;
 }
@@ -90,7 +90,7 @@ ClientConnection::newRequestsAllowed()
 size_t
 ClientConnection::outstandingRequests()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     invariant();
     return m_pendingRequests.size();
 }
@@ -119,7 +119,7 @@ void
 ClientConnection::idleTimeout(unsigned long long us, boost::function<void ()> dg)
 {
     MORDOR_ASSERT(us == ~0ull || m_timerManager);
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_idleTimer) {
         m_idleTimer->cancel();
         m_idleTimer.reset();
@@ -134,7 +134,7 @@ void
 ClientConnection::scheduleNextRequest(ClientRequest *request)
 {
     bool flush = false;
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     invariant();
     MORDOR_ASSERT(m_currentRequest != m_pendingRequests.end());
     MORDOR_ASSERT(request == *m_currentRequest);
@@ -170,16 +170,16 @@ ClientConnection::scheduleNextRequest(ClientRequest *request)
         // Take a trip through the Scheduler, trying to let someone else
         // attempt to pipeline
         if (Scheduler::getThis()) {
-            lock.unlock();
+            m_mutex.unlock();
             Scheduler::yield();
-            lock.lock();
+            m_mutex.lock();
         }
         invariant();
         std::list<ClientRequest *>::iterator it(m_currentRequest);
         ++it;
         if (it == m_pendingRequests.end()) {
             // Nope, still the end, we really do have to flush
-            lock.unlock();
+            m_mutex.unlock();
         } else {
             flush = false;
         }
@@ -194,7 +194,7 @@ ClientConnection::scheduleNextRequest(ClientRequest *request)
                 request->requestFailed();
                 throw;
             }
-            lock.lock();
+            m_mutex.lock();
             invariant();
         }
         request->m_requestState = ClientRequest::COMPLETE;
@@ -206,7 +206,7 @@ ClientConnection::scheduleNextRequest(ClientRequest *request)
                 m_priorResponseFailed <= request->m_requestNumber) {
                 MORDOR_ASSERT(m_pendingRequests.empty());
                 closetype = Stream::BOTH;
-                lock.unlock();
+                m_mutex.unlock();
                 MORDOR_LOG_TRACE(g_log) << m_connectionNumber << " closing";
             }
         }
@@ -240,7 +240,7 @@ ClientConnection::scheduleNextResponse(ClientRequest *request)
 {
     bool close = false;
     {
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         invariant();
         MORDOR_ASSERT(!m_pendingRequests.empty());
         MORDOR_ASSERT(request == m_pendingRequests.front());
@@ -503,7 +503,7 @@ ClientRequest::~ClientRequest()
     cancel(true);
 #ifndef NDEBUG
     MORDOR_ASSERT(m_conn);
-    boost::mutex::scoped_lock lock(m_conn->m_mutex);
+    std::lock_guard<std::mutex> lock(m_conn->m_mutex);
     MORDOR_ASSERT(std::find(m_conn->m_pendingRequests.begin(),
         m_conn->m_pendingRequests.end(),
         this) == m_conn->m_pendingRequests.end());
@@ -694,7 +694,7 @@ ClientRequest::cancel(bool abort, bool error)
         // Just abandon it
         m_requestState = CANCELED;
         m_responseState = CANCELED;
-        boost::mutex::scoped_lock lock(m_conn->m_mutex);
+        std::lock_guard<std::mutex> lock(m_conn->m_mutex);
         m_conn->invariant();
         std::list<ClientRequest *>::iterator it =
             std::find(m_conn->m_pendingRequests.begin(),
@@ -743,7 +743,7 @@ ClientRequest::cancel(bool abort, bool error)
     if (m_responseState != HEADERS)
         abort = true;
     {
-        boost::mutex::scoped_lock lock(m_conn->m_mutex);
+        std::lock_guard<std::mutex> lock(m_conn->m_mutex);
         m_conn->invariant();
         m_conn->m_priorResponseFailed = m_requestNumber;
         if (m_requestState < COMPLETE)
@@ -821,7 +821,7 @@ ClientRequest::waitForRequest()
     bool firstRequest;
     // Put the request in the queue
     {
-        boost::mutex::scoped_lock lock(m_conn->m_mutex);
+        std::lock_guard<std::mutex> lock(m_conn->m_mutex);
         m_conn->invariant();
         if (!m_conn->m_allowNewRequests || m_conn->m_priorResponseClosed != ~0ull) {
             m_requestState = m_responseState = ERROR;
@@ -860,7 +860,7 @@ ClientRequest::waitForRequest()
         Scheduler::yieldTo();
         MORDOR_LOG_TRACE(g_log) << m_conn->m_connectionNumber << "-" << m_requestNumber << " requesting";
         // Check for problems that occurred while we were waiting
-        boost::mutex::scoped_lock lock(m_conn->m_mutex);
+        std::lock_guard<std::mutex> lock(m_conn->m_mutex);
         m_conn->invariant();
         if (m_conn->m_priorResponseClosed != ~0ull ||
             m_conn->m_priorRequestFailed ||
@@ -955,7 +955,7 @@ ClientRequest::doRequest()
         }
     }
     if (close) {
-        boost::mutex::scoped_lock lock(m_conn->m_mutex);
+        std::lock_guard<std::mutex> lock(m_conn->m_mutex);
         m_conn->invariant();
         m_conn->m_allowNewRequests = false;
     }
@@ -994,7 +994,7 @@ ClientRequest::ensureResponse()
         bool wait = false;
         MORDOR_ASSERT(m_responseState == PENDING);
         {
-            boost::mutex::scoped_lock lock(m_conn->m_mutex);
+            std::lock_guard<std::mutex> lock(m_conn->m_mutex);
             m_conn->invariant();
             if (m_conn->m_priorResponseFailed <= m_requestNumber ||
                 m_conn->m_priorResponseClosed <= m_requestNumber) {
@@ -1034,7 +1034,7 @@ ClientRequest::ensureResponse()
             Scheduler::yieldTo();
             MORDOR_LOG_TRACE(g_log) << m_conn->m_connectionNumber << "-" << m_requestNumber << " reading response";
             // Check for problems that occurred while we were waiting
-            boost::mutex::scoped_lock lock(m_conn->m_mutex);
+            std::lock_guard<std::mutex> lock(m_conn->m_mutex);
             m_conn->invariant();
             if (m_responseState == CANCELED)
                 MORDOR_THROW_EXCEPTION(OperationAbortedException());
@@ -1141,7 +1141,7 @@ ClientRequest::ensureResponse()
                 close = true;
 
             if (close) {
-                boost::mutex::scoped_lock lock(m_conn->m_mutex);
+                std::lock_guard<std::mutex> lock(m_conn->m_mutex);
                 m_conn->invariant();
                 m_conn->m_priorResponseClosed = m_requestNumber;
                 MORDOR_ASSERT(!m_conn->m_pendingRequests.empty());
@@ -1169,7 +1169,7 @@ ClientRequest::ensureResponse()
                 }
             }
         } catch (...) {
-            boost::mutex::scoped_lock lock(m_conn->m_mutex);
+            std::lock_guard<std::mutex> lock(m_conn->m_mutex);
             m_conn->invariant();
             m_conn->m_priorResponseFailed = (std::min)(m_requestNumber,
                 m_conn->m_priorResponseFailed);
@@ -1241,7 +1241,7 @@ ClientRequest::requestFailed()
         notify->notifyOnEof = NULL;
         notify->notifyOnException = NULL;
     }
-    boost::mutex::scoped_lock lock(m_conn->m_mutex);
+    std::lock_guard<std::mutex> lock(m_conn->m_mutex);
     m_conn->invariant();
     MORDOR_ASSERT(!m_conn->m_pendingRequests.empty());
     MORDOR_ASSERT(this == *m_conn->m_currentRequest);

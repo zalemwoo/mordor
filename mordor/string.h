@@ -6,11 +6,6 @@
 #include <string>
 #include <vector>
 
-#ifndef BOOST_TYPEOF_SILENT
-#define BOOST_TYPEOF_SILENT
-#endif
-#include <boost/typeof/typeof.hpp>
-
 #include "version.h"
 
 #ifdef OSX
@@ -65,18 +60,30 @@ unsigned long long stringToMicroseconds(const std::string &string);
 
 namespace detail
 {
+
+    template <bool B, class T = void>
+    struct disable_if_c {
+      typedef T type;
+    };
+
+    template <class T>
+    struct disable_if_c<true, T> {};
+
+    template <class Cond, class T = void>
+    struct disable_if : public disable_if_c<Cond::value, T> {};
+
     template <class T>
     typename std::enable_if<sizeof(T) == 2, wchar_t>::type utf16func();
     template <class T>
-    typename boost::disable_if_c<sizeof(T) == 2, unsigned short>::type utf16func();
+    typename disable_if_c<sizeof(T) == 2, unsigned short>::type utf16func();
     template <class T>
     typename std::enable_if<sizeof(T) == 4, wchar_t>::type utf32func();
     template <class T>
-    typename boost::disable_if_c<sizeof(T) == 4, unsigned int>::type utf32func();
+    typename disable_if_c<sizeof(T) == 4, unsigned int>::type utf32func();
 };
 
-typedef BOOST_TYPEOF(detail::utf16func<wchar_t>()) utf16char;
-typedef BOOST_TYPEOF(detail::utf32func<wchar_t>()) utf32char;
+typedef decltype(detail::utf16func<wchar_t>()) utf16char;
+typedef decltype(detail::utf32func<wchar_t>()) utf32char;
 
 typedef std::basic_string<utf16char> utf16string;
 typedef std::basic_string<utf32char> utf32string;

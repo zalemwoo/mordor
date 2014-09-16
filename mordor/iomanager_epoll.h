@@ -2,6 +2,8 @@
 #define __MORDOR_IOMANAGER_EPOLL_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
+#include <mutex>
+
 #include "scheduler.h"
 #include "timer.h"
 #include "version.h"
@@ -35,7 +37,7 @@ private:
             EventContext() : scheduler(NULL) {}
             Scheduler *scheduler;
             std::shared_ptr<Fiber> fiber;
-            boost::function<void ()> dg;
+            std::function<void ()> dg;
         };
 
         EventContext &contextForEvent(Event event);
@@ -45,7 +47,7 @@ private:
         int m_fd;
         EventContext m_in, m_out, m_close;
         Event m_events;
-        boost::mutex m_mutex;
+        std::mutex m_mutex;
 
     private:
         void asyncResetContext(EventContext&);
@@ -61,7 +63,7 @@ public:
     bool stopping();
 
     void registerEvent(int fd, Event events,
-        boost::function<void ()> dg = NULL);
+        std::function<void ()> dg = NULL);
     /// Will not cause the event to fire
     /// @return If the event was successfully unregistered before firing normally
     bool unregisterEvent(int fd, Event events);
@@ -79,7 +81,7 @@ private:
     int m_epfd;
     int m_tickleFds[2];
     size_t m_pendingEventCount;
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::vector<AsyncState *> m_pendingEvents;
 };
 

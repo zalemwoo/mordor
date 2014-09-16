@@ -60,13 +60,6 @@ static unsigned long long g_start;
 
 namespace {
 
-static inline std::time_t formatTimePoint (const std::chrono::system_clock::time_point& tp)
-{
-     // convert to system time:
-     std::time_t t = std::chrono::system_clock::to_time_t(tp);
-     return t;
-}
-
 static struct LogInitializer
 {
     LogInitializer()
@@ -90,6 +83,13 @@ static struct LogInitializer
     }
 } g_init;
 
+}
+
+static inline std::time_t formatTimePoint (const std::chrono::system_clock::time_point& tp)
+{
+     // convert to system time:
+     std::time_t t = std::chrono::system_clock::to_time_t(tp);
+     return t;
 }
 
 static void enableLogger(Logger::ptr logger,
@@ -217,7 +217,7 @@ StdoutLogSink::log(const std::string &logger,
         const char *file, int line)
 {
     std::ostringstream os;
-    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
+    os << Mordor::formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << str << std::endl;
     std::cout << os.str();
@@ -233,7 +233,7 @@ DebugLogSink::log(const std::string &logger,
         const char *file, int line)
 {
     std::wostringstream os;
-    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
+    os << Mordor::formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << toUtf16(logger) << " " << toUtf16(file)
         << ":" << line << " " << toUtf16(str) << std::endl;
     OutputDebugStringW(os.str().c_str());
@@ -272,7 +272,7 @@ SyslogLogSink::log(const std::string &logger,
             break;
     }
     std::ostringstream os;
-    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
+    os << Mordor::formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << string << std::endl;
     std::string str = os.str();
@@ -319,7 +319,7 @@ FileLogSink::log(const std::string &logger,
         const char *file, int line)
 {
     std::ostringstream os;
-    os << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
+    os << Mordor::formatTimePoint(now) << " " << elapsed << " " << level << " " << thread << " "
         << fiber << " " << logger << " " << file << ":" << line << " "
         << str << std::endl;
     std::string logline = os.str();

@@ -634,7 +634,7 @@ SSLStream::serverNameIndication(const std::string &hostname)
     // Older versions of OpenSSL don't support this (I'm looking at you,
     // Leopard); just ignore it then
 #ifdef SSL_set_tlsext_host_name
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!SSL_set_tlsext_host_name(m_ssl.get(), hostname.c_str())) {
         if (!hasOpenSSLError()) return;
         std::string message = getOpenSSLErrorMessage();
@@ -661,7 +661,7 @@ void
 SSLStream::verifyPeerCertificate(const std::string &hostname)
 {
     if (!hostname.empty()) {
-        boost::mutex::scoped_lock lock(m_mutex);
+        std::lock_guard<std::mutex> lock(m_mutex);
         std::string wildcardHostname = "*";
         size_t dot = hostname.find('.');
         if (dot != std::string::npos)
@@ -750,7 +750,7 @@ SSLStream::wantRead()
 int
 SSLStream::sslCallWithLock(boost::function<int ()> dg, unsigned long *error)
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
 
     // If error is NULL, it means that sslCallWithLock is not supposed to call SSL_get_error
     // after dg got called. If SSL_get_error is not supposed to be called, there is no need

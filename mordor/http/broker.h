@@ -2,6 +2,7 @@
 #define __HTTP_BROKER_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
+#include <mutex>
 #include <openssl/ssl.h>
 
 #include "http.h"
@@ -85,7 +86,7 @@ public:
     {  m_filterNetworkCallback = fnCallback; }
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     bool m_cancelled;
     std::list<std::shared_ptr<Socket> > m_pending; // Multiple connections may be attempted when getaddrinfo returns multiple addresses
     IOManager *m_ioManager;

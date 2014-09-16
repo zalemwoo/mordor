@@ -1,7 +1,7 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
+#include <mutex>
 #include <boost/bind.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "mordor/atomic.h"
 #include "mordor/fiber.h"
@@ -352,10 +352,10 @@ MORDOR_UNITTEST(Scheduler, parallelForEachStopShortParallel)
 // #endif
 
 static void sleepForABit(std::set<tid_t> &threads,
-    boost::mutex &mutex, Fiber::ptr scheduleMe, int *count)
+    std::mutex &mutex, Fiber::ptr scheduleMe, int *count)
 {
     {
-        boost::mutex::scoped_lock lock(mutex);
+        std::lock_guard<std::mutex> lock(mutex);
         threads.insert(gettid());
     }
     Mordor::sleep(10000);
@@ -367,7 +367,7 @@ MORDOR_UNITTEST(Scheduler, spreadTheLoad)
 {
     std::set<tid_t> threads;
     {
-        boost::mutex mutex;
+        std::mutex mutex;
         WorkerPool pool(8);
         // Wait for the other threads to get to idle first
         Mordor::sleep(100000);
@@ -410,7 +410,7 @@ MORDOR_UNITTEST(Scheduler, stopIdleMultithreaded)
 }
 
 static void startTheFibers(std::set<tid_t> &threads,
-    boost::mutex &mutex)
+    std::mutex &mutex)
 {
     Mordor::sleep(100000);
     for (size_t i = 0; i < 24; ++i)
@@ -423,7 +423,7 @@ MORDOR_UNITTEST(Scheduler, spreadTheLoadWhileStopping)
 {
     std::set<tid_t> threads;
     {
-        boost::mutex mutex;
+        std::mutex mutex;
         WorkerPool pool(8);
         // Wait for the other threads to get to idle first
         Mordor::sleep(100000);
@@ -447,10 +447,10 @@ MORDOR_UNITTEST(Scheduler, tolerantExceptionInBatch)
 {
     WorkerPool pool(1, true, 10); // batchSize set to 10
     std::vector<int> values(3);
-    std::vector<boost::function<void ()> > dgs;
-    dgs.push_back(boost::bind(runOrException, boost::ref(values[0]), 1, false));
-    dgs.push_back(boost::bind(runOrException, boost::ref(values[1]), 2, true));
-    dgs.push_back(boost::bind(runOrException, boost::ref(values[2]), 3, false));
+    std::vector<std::function<void ()> > dgs;
+    dgs.push_back(std::bind(runOrException, std::ref(values[0]), 1, false));
+    dgs.push_back(std::bind(runOrException, std::ref(values[1]), 2, true));
+    dgs.push_back(std::bind(runOrException, std::ref(values[2]), 3, false));
     pool.schedule(dgs.begin(), dgs.end());
 
     MORDOR_TEST_ASSERT_EQUAL(values[0], 0);
@@ -468,16 +468,16 @@ MORDOR_UNITTEST(Scheduler, tolerantExceptionInBatch)
     MORDOR_TEST_ASSERT_EQUAL(values[2], 3);
 }
 
-static void doSleeping(boost::mutex &mutex, int &count, int &reference, int &max, IOManager &ioManager)
+static void doSleeping(std::mutex &mutex, int &count, int &reference, int &max, IOManager &ioManager)
 {
-    boost::mutex::scoped_lock lock(mutex);
+    std::lock_guard<std::mutex> lock(mutex);
     ++reference;
     ++count;
     if (reference > max)
         max = reference;
-    lock.unlock();
+    mutex.unlock();
     sleep(ioManager, 5000);
-    lock.lock();
+    mutex.lock();
     --reference;
 }
 
@@ -485,7 +485,7 @@ MORDOR_UNITTEST(Scheduler, parallelDoParallelism)
 {
     IOManager ioManager(6, true);
     int reference = 0, count = 0, max = 0;
-    boost::mutex mutex;
+    std::mutex mutex;
     std::vector<boost::function<void ()> > dgs;
     for (int i=0; i<1000; ++i) {
         dgs.push_back(boost::bind(&doSleeping,

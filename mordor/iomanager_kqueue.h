@@ -4,7 +4,7 @@
 
 #include <sys/types.h>
 #include <sys/event.h>
-
+#include <mutex>
 #include <map>
 
 #include "scheduler.h"
@@ -33,7 +33,7 @@ private:
 
         Scheduler *m_scheduler, *m_schedulerClose;
         std::shared_ptr<Fiber> m_fiber, m_fiberClose;
-        boost::function<void ()> m_dg, m_dgClose;
+        std::function<void ()> m_dg, m_dgClose;
     };
 
 public:
@@ -42,7 +42,7 @@ public:
 
     bool stopping();
 
-    void registerEvent(int fd, Event events, boost::function<void ()> dg = NULL);
+    void registerEvent(int fd, Event events, std::function<void ()> dg = NULL);
     void cancelEvent(int fd, Event events);
     void unregisterEvent(int fd, Event events);
 
@@ -57,7 +57,7 @@ private:
     int m_kqfd;
     int m_tickleFds[2];
     std::map<std::pair<int, Event>, AsyncEvent> m_pendingEvents;
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
 };
 
 }

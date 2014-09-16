@@ -3,6 +3,7 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <vector>
+#include <mutex>
 
 #include <boost/bind.hpp>
 #include <boost/noncopyable.hpp>
@@ -55,14 +56,14 @@ template<class Iterator, class Functor>
 static
 void
 parallel_foreach_impl(Iterator &begin, Iterator &end, Functor &functor,
-                      boost::mutex &mutex, std::exception_ptr &exception,
+                      std::mutex &mutex, std::exception_ptr &exception,
                       Scheduler *scheduler, Fiber::ptr caller, int &count)
 {
     while (true) {
         try {
             Iterator it;
             {
-                boost::mutex::scoped_lock lock(mutex);
+                std::lock_guard<std::mutex> lock(mutex);
                 if (begin == end || exception)
                     break;
                 it = begin++;
@@ -70,11 +71,11 @@ parallel_foreach_impl(Iterator &begin, Iterator &end, Functor &functor,
             functor(*it);
         } catch (std::exception &ex) {
             removeTopFrames(ex);
-            boost::mutex::scoped_lock lock(mutex);
+            std::lock_guard<std::mutex> lock(mutex);
             exception = std::current_exception();
             break;
         } catch (...) {
-            boost::mutex::scoped_lock lock(mutex);
+            std::lock_guard<std::mutex> lock(mutex);
             exception = std::current_exception();
             break;
         }
@@ -121,7 +122,7 @@ parallel_foreach(Iterator begin, Iterator end, Functor functor,
         return;
     }
 
-    boost::mutex mutex;
+    std::mutex mutex;
     std::exception_ptr exception;
     MORDOR_LOG_DEBUG(Detail::getLogger()) << " running parallel_for with "
         << parallelism << " fibers";

@@ -4,10 +4,9 @@
 
 #include <list>
 #include <set>
+#include <mutex>
 
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "connection.h"
 
@@ -176,12 +175,12 @@ private:
     void scheduleAllWaitingResponses();
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::shared_ptr<TimeoutStream> m_timeoutStream;
     unsigned long long m_readTimeout, m_idleTimeout;
     std::shared_ptr<Timer> m_idleTimer;
     TimerManager *m_timerManager;
-    boost::function<void ()> m_idleDg;
+    std::function<void ()> m_idleDg;
     std::list<ClientRequest *> m_pendingRequests;
     std::list<ClientRequest *>::iterator m_currentRequest;
     std::set<ClientRequest *> m_waitingResponses;

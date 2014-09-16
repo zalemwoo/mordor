@@ -4,6 +4,7 @@
 
 #include "antxmllistener.h"
 
+#include <mutex>
 #include <iostream>
 
 #include <boost/date_time/posix_time/posix_time_io.hpp>
@@ -53,12 +54,12 @@ public:
             localOS << formatTimePoint(now) << " " << elapsed << " " << level << " " << thread
                     << " " << fiber << " " << logger << " " << file << ":"
                     << line << " " << str << std::endl;
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             *os << localOS.str();
         }
     }
 
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::ostringstream *m_out, *m_err;
 };
 

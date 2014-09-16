@@ -4,10 +4,10 @@
 
 #include "filter.h"
 
+#include <mutex>
 #include <vector>
 
 #include <openssl/ssl.h>
-#include <boost/thread.hpp>
 
 #include "buffer.h"
 
@@ -76,7 +76,7 @@ private:
     int sslCallWithLock(boost::function<int ()> dg, unsigned long *error);
 
 private:
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::shared_ptr<SSL_CTX> m_ctx;
     std::shared_ptr<SSL> m_ssl;
     Buffer m_readBuffer, m_writeBuffer;

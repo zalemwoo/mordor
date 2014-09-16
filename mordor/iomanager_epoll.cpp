@@ -102,7 +102,7 @@ IOManager::AsyncState::AsyncState()
 
 IOManager::AsyncState::~AsyncState()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     MORDOR_ASSERT(!m_events);
 }
 
@@ -145,8 +145,8 @@ IOManager::AsyncState::asyncResetContext(AsyncState::EventContext& context)
     // However, it is needed to acquire the lock and then unlock
     // to ensure that this function is executed after the other
     // fiber which scheduled this async reset call.
-    boost::mutex::scoped_lock lock(m_mutex);
-    lock.unlock();
+    std::lock_guard<std::mutex> lock(m_mutex);
+    m_mutex.unlock();
     context.fiber.reset();
     context.dg = NULL;
 }
@@ -243,7 +243,7 @@ IOManager::stopping()
 }
 
 void
-IOManager::registerEvent(int fd, Event event, boost::function<void ()> dg)
+IOManager::registerEvent(int fd, Event event, std::function<void ()> dg)
 {
     MORDOR_ASSERT(fd > 0);
     MORDOR_ASSERT(Scheduler::getThis());
@@ -251,7 +251,7 @@ IOManager::registerEvent(int fd, Event event, boost::function<void ()> dg)
     MORDOR_ASSERT(event == READ || event == WRITE || event == CLOSE);
 
     // Look up our state in the global map, expanding it if necessary
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_pendingEvents.size() < (size_t)fd)
         m_pendingEvents.resize(fd * 3 / 2);
     if (!m_pendingEvents[fd - 1]) {
@@ -260,9 +260,9 @@ IOManager::registerEvent(int fd, Event event, boost::function<void ()> dg)
     }
     AsyncState &state = *m_pendingEvents[fd - 1];
     MORDOR_ASSERT(fd == state.m_fd);
-    lock.unlock();
+    m_mutex.unlock();
 
-    boost::mutex::scoped_lock lock2(state.m_mutex);
+    std::lock_guard<std::mutex> lock2(state.m_mutex);
 
     MORDOR_ASSERT(!(state.m_events & event));
     int op = state.m_events ? EPOLL_CTL_MOD : EPOLL_CTL_ADD;
@@ -296,16 +296,16 @@ IOManager::unregisterEvent(int fd, Event event)
     MORDOR_ASSERT(fd > 0);
     MORDOR_ASSERT(event == READ || event == WRITE || event == CLOSE);
 
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_pendingEvents.size() < (size_t)fd)
         return false;
     if (!m_pendingEvents[fd - 1])
         return false;
     AsyncState &state = *m_pendingEvents[fd - 1];
     MORDOR_ASSERT(fd == state.m_fd);
-    lock.unlock();
+    m_mutex.unlock();
 
-    boost::mutex::scoped_lock lock2(state.m_mutex);
+    std::lock_guard<std::mutex> lock2(state.m_mutex);
     if (!(state.m_events & event))
         return false;
 
@@ -336,16 +336,16 @@ IOManager::cancelEvent(int fd, Event event)
     MORDOR_ASSERT(fd > 0);
     MORDOR_ASSERT(event == READ || event == WRITE || event == CLOSE);
 
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (m_pendingEvents.size() < (size_t)fd)
         return false;
     if (!m_pendingEvents[fd - 1])
         return false;
     AsyncState &state = *m_pendingEvents[fd - 1];
     MORDOR_ASSERT(fd == state.m_fd);
-    lock.unlock();
+    m_mutex.unlock();
 
-    boost::mutex::scoped_lock lock2(state.m_mutex);
+    std::lock_guard<std::mutex> lock2(state.m_mutex);
     if (!(state.m_events & event))
         return false;
 
@@ -400,7 +400,7 @@ IOManager::idle()
             << " (" << lastError() << ")";
         if (rc < 0)
             MORDOR_THROW_EXCEPTION_FROM_LAST_ERROR_API("epoll_wait");
-        std::vector<boost::function<void ()> > expired = processTimers();
+        std::vector<std::function<void ()> > expired = processTimers();
         if (!expired.empty()) {
             schedule(expired.begin(), expired.end());
             expired.clear();
@@ -421,7 +421,7 @@ IOManager::idle()
 
             AsyncState &state = *(AsyncState *)event.data.ptr;
 
-            boost::mutex::scoped_lock lock2(state.m_mutex);
+            std::lock_guard<std::mutex> lock2(state.m_mutex);
             MORDOR_LOG_TRACE(g_log) << " epoll_event {"
                 << (EPOLL_EVENTS)event.events << ", " << state.m_fd
                 << "}, registered for " << (EPOLL_EVENTS)state.m_events;

@@ -3,9 +3,7 @@
 
 #include <map>
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "scheduler.h"
 #include "timer.h"
@@ -42,7 +40,7 @@ private:
         WaitBlock(IOManager &outer);
         ~WaitBlock();
 
-        bool registerEvent(HANDLE handle, boost::function<void ()> dg,
+        bool registerEvent(HANDLE handle, std::function<void ()> dg,
             bool recurring);
         size_t unregisterEvent(HANDLE handle);
 
@@ -51,13 +49,13 @@ private:
         void removeEntry(int index);
 
     private:
-        boost::mutex m_mutex;
+        std::mutex m_mutex;
         IOManager &m_outer;
         HANDLE m_reconfigured;
         HANDLE m_handles[MAXIMUM_WAIT_OBJECTS];
         Scheduler *m_schedulers[MAXIMUM_WAIT_OBJECTS];
         std::shared_ptr<Fiber> m_fibers[MAXIMUM_WAIT_OBJECTS];
-        boost::function<void ()> m_dgs[MAXIMUM_WAIT_OBJECTS];
+        std::function<void ()> m_dgs[MAXIMUM_WAIT_OBJECTS];
         bool m_recurring[MAXIMUM_WAIT_OBJECTS];
         int m_inUseCount;
     };
@@ -95,7 +93,7 @@ public:
     // Register a handle to an Windows Event.
     // The callback "dg" will be scheduled once the event
     // is signalled.
-    void registerEvent(HANDLE handle, boost::function<void ()> dg,
+    void registerEvent(HANDLE handle, std::function<void ()> dg,
         bool recurring = false);
 
     // Register a handle to an Windows Event.
@@ -150,12 +148,12 @@ private:
     std::map<OVERLAPPED *, AsyncEvent*> m_pendingEvents;
 #endif
     size_t m_pendingEventCount;
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::list<WaitBlock::ptr> m_waitBlocks;
 
     // These variables are part of the hack for #111932.
     // See the comment for setIOCPErrorTolerance().
-    static boost::mutex m_errorMutex;
+    static std::mutex m_errorMutex;
     static size_t m_iocpAllowedErrorCount;
     static size_t m_iocpErrorCountWindowInSeconds;
     static size_t m_errorCount;

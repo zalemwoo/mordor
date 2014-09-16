@@ -219,13 +219,13 @@ ProxyCache::~ProxyCache()
         pWinHttpCloseHandle(m_hHttpSession);
 }
 
-boost::mutex ProxyCache::s_cacheMutex;
+std::mutex ProxyCache::s_cacheMutex;
 bool ProxyCache::s_failedAutoDetect = false;
 std::set<std::string> ProxyCache::s_invalidConfigURLs;
 
 void ProxyCache::resetDetectionResultCache()
 {
-    boost::mutex::scoped_lock lock(s_cacheMutex);
+    std::lock_guard<std::mutex> lock(s_cacheMutex);
     s_failedAutoDetect = false;
     s_invalidConfigURLs.clear();
 }
@@ -246,7 +246,7 @@ bool ProxyCache::autoDetectProxy(const URI &uri, const std::string &pacScript,
     // and failed. Auto-detection and auto-configuration failures can take a
     // long time, so we want to avoid trying them repeatedly.
     {
-        boost::mutex::scoped_lock lock(s_cacheMutex);
+        std::lock_guard<std::mutex> lock(s_cacheMutex);
         if (pacScript.empty()) {
             if (s_failedAutoDetect) {
                 MORDOR_LOG_DEBUG(proxyLog) << "Using cached auto-detection result.";
@@ -281,7 +281,7 @@ bool ProxyCache::autoDetectProxy(const URI &uri, const std::string &pacScript,
         // Record the fact that this PAC file URL failed in our cache, so that
         // we don't attempt to run it again.
         {
-            boost::mutex::scoped_lock lock(s_cacheMutex);
+            std::lock_guard<std::mutex> lock(s_cacheMutex);
             if (pacScript.empty()) {
                 s_failedAutoDetect = true;
             } else {
@@ -335,7 +335,7 @@ ProxyCache::~ProxyCache()
 {
     // Shut down the PAC worker thread
     {
-        boost::mutex::scoped_lock lk(m_pacMut);
+        std::lock_guard<std::mutex> lk(m_pacMut);
         m_pacThreadCancelled = true;
     }
     m_pacCond.notify_one();
@@ -398,7 +398,7 @@ std::vector<URI> ProxyCache::proxyFromCFArray(CFArrayRef proxies, ScopedCFRef<CF
 void ProxyCache::runPacWorker()
 {
     while(true) {
-        boost::mutex::scoped_lock lk(m_pacMut);
+        std::lock_guard<std::mutex> lk(m_pacMut);
 
         while(m_pacQueue.empty() && !m_pacThreadCancelled)
             m_pacCond.wait(lk);
@@ -489,7 +489,7 @@ std::vector<URI> ProxyCache::proxyFromPacScript(CFURLRef cfurl, ScopedCFRef<CFUR
         // we don't crash due to the JavaScript VM's garbage collection.
         struct PacMessage msg;
         {
-            boost::mutex::scoped_lock lk(m_pacMut);
+            std::lock_guard<std::mutex> lk(m_pacMut);
             msg.pacScript = pacScript;
             msg.targeturl = targeturl;
             msg.result = NULL;
@@ -502,7 +502,7 @@ std::vector<URI> ProxyCache::proxyFromPacScript(CFURLRef cfurl, ScopedCFRef<CFUR
 
         // Wake up periodically to see if our PAC message has been processed
         while(true) {
-            boost::mutex::scoped_lock lk(m_pacMut);
+            std::lock_guard<std::mutex> lk(m_pacMut);
             if(msg.processed)
                 break;
             lk.unlock();

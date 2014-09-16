@@ -198,7 +198,7 @@ private:
 class TestTimerManager : public TimerManager
 {
 public:
-    std::vector<boost::function<void ()> > getExpiredTimers()
+    std::vector<std::function<void ()> > getExpiredTimers()
     {
         return processTimers();
     }
@@ -257,11 +257,11 @@ MORDOR_UNITTEST(Timer, workerPoolConditionValid)
 
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
     Timer::ptr timer = manager.registerConditionTimer(0,
-        boost::bind(&TestTimerClass::timedOut, tester.get(), 1),
+        std::bind(&TestTimerClass::timedOut, tester.get(), 1),
         tester);
     MORDOR_TEST_ASSERT_EQUAL(manager.nextTimer(), 0ull);
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
-    std::vector<boost::function<void ()> > dgs = manager.getExpiredTimers();
+    std::vector<std::function<void ()> > dgs = manager.getExpiredTimers();
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
     MORDOR_TEST_ASSERT_EQUAL(dgs.size(), 1u);
     MORDOR_TEST_ASSERT(dgs.begin() != dgs.end());
@@ -286,11 +286,11 @@ MORDOR_UNITTEST(Timer, workerPoolConditonInvalid)
 
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
     Timer::ptr timer = manager.registerConditionTimer(0,
-        boost::bind(&TestTimerClass::timedOut, tester.get(), 123456),
+        std::bind(&TestTimerClass::timedOut, tester.get(), 123456),
         tester);
     MORDOR_TEST_ASSERT_EQUAL(manager.nextTimer(), 0ull);
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
-    std::vector<boost::function<void ()> > dgs = manager.getExpiredTimers();
+    std::vector<std::function<void ()> > dgs = manager.getExpiredTimers();
     MORDOR_TEST_ASSERT_EQUAL(sequence, 0);
     MORDOR_TEST_ASSERT_EQUAL(dgs.size(), 1u);
     MORDOR_TEST_ASSERT(dgs.begin() != dgs.end());

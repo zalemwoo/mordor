@@ -15,7 +15,7 @@
 #include <string.h>
 #endif
 
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 
 #include "socket.h"
 
@@ -49,8 +49,8 @@ static struct Initializer {
 std::string to_string(const std::vector<void *> backtrace)
 {
 #ifdef WINDOWS
-    static boost::mutex s_mutex;
-    boost::mutex::scoped_lock lock(s_mutex);
+    static std::mutex s_mutex;
+    std::lock_guard<std::mutex> lock(s_mutex);
 #endif
     std::ostringstream os;
 #ifdef POSIX

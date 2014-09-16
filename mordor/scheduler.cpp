@@ -55,7 +55,7 @@ void
 Scheduler::start()
 {
     MORDOR_LOG_VERBOSE(g_log) << this << " starting " << m_threadCount << " threads";
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (!m_stopping)
         return;
     // TODO: There may be a race condition here if one thread calls stop(),
@@ -75,7 +75,7 @@ Scheduler::start()
 bool
 Scheduler::hasWorkToDo()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     return !m_fibers.empty();
 }
 
@@ -135,7 +135,7 @@ Scheduler::stop()
             << " waiting for other threads to stop";
         std::vector<std::shared_ptr<Thread> > threads;
         {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             threads.swap(m_threads);
         }
         for (std::vector<std::shared_ptr<Thread> >::const_iterator it
@@ -151,7 +151,7 @@ Scheduler::stop()
 bool
 Scheduler::stopping()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     return m_stopping && m_fibers.empty() && m_activeThreadCount == 0;
 }
 
@@ -209,7 +209,7 @@ Scheduler::threadCount(size_t threads)
     MORDOR_ASSERT(threads >= 1);
     if (m_rootFiber)
         --threads;
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     if (threads == m_threadCount) {
         return;
     } else if (threads > m_threadCount) {
@@ -259,7 +259,7 @@ Scheduler::run()
         bool dontIdle = false;
         bool tickleMe = false;
         {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             // Kill ourselves off if needed
             if (m_threads.size() > m_threadCount && gettid() != m_rootThread) {
                 // Accounting
@@ -393,7 +393,7 @@ Scheduler::run()
                 }
 
                 {
-                    boost::mutex::scoped_lock lock(m_mutex);
+                    std::lock_guard<std::mutex> lock(m_mutex);
                     // push all un-executed fibers back to m_fibers
                     copy(batch.begin(), batch.end(), back_inserter(m_fibers));
                     batch.clear();

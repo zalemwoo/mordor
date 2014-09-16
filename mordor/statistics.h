@@ -24,7 +24,7 @@ struct Statistic
     virtual std::ostream &serialize(std::ostream &os) const { return os; }
 
     virtual const Statistic *begin() const { return NULL; }
-    virtual const Statistic *next(const Statistic *) const { MORDOR_NOTREACHED(); }
+    virtual const Statistic *next(const Statistic *) const { MORDOR_NOTREACHED(); return NULL;}
 };
 
 inline std::ostream &operator <<(std::ostream &os, const Statistic &stat)

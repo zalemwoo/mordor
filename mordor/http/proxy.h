@@ -2,6 +2,8 @@
 #define __MORDOR_HTTP_PROXY_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
+#include <mutex>
+
 #include "mordor/uri.h"
 
 #ifdef WINDOWS
@@ -79,7 +81,7 @@ private:
     // resetDetectionResultCache(), defined above.
     //
     // The lock held when accessing the static member variables.
-    static boost::mutex s_cacheMutex;
+    static std::mutex s_cacheMutex;
 
     // True if WPAD failed.
     static bool s_failedAutoDetect;
@@ -112,7 +114,7 @@ private:
 
     boost::thread m_pacThread;
     boost::condition_variable m_pacCond;
-    boost::mutex m_pacMut;
+    std::mutex m_pacMut;
     std::queue<PacMessage*> m_pacQueue;
     bool m_pacThreadCancelled;
 

@@ -3,11 +3,10 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <list>
+#include <mutex>
 
 #include <boost/function.hpp>
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "thread.h"
 #include "thread_local_storage.h"
@@ -82,7 +81,7 @@ public:
     {
         bool tickleMe;
         {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             tickleMe = scheduleNoLock(fd, thread);
         }
         if (shouldTickle(tickleMe))
@@ -98,7 +97,7 @@ public:
     {
         bool tickleMe = false;
         {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             while (begin != end) {
                 tickleMe = scheduleNoLock(&*begin) || tickleMe;
                 ++begin;
@@ -203,7 +202,7 @@ private:
 private:
     struct FiberAndThread {
         std::shared_ptr<Fiber> fiber;
-        boost::function<void ()> dg;
+        std::function<void ()> dg;
         tid_t thread;
         FiberAndThread(std::shared_ptr<Fiber> f, tid_t th)
             : fiber(f), thread(th) {}
@@ -211,16 +210,16 @@ private:
             : thread(th) {
             fiber.swap(*f);
         }
-        FiberAndThread(boost::function<void ()> d, tid_t th)
+        FiberAndThread(std::function<void ()> d, tid_t th)
             : dg(d), thread(th) {}
-        FiberAndThread(boost::function<void ()> *d, tid_t th)
+        FiberAndThread(std::function<void ()> *d, tid_t th)
             : thread(th) {
             dg.swap(*d);
         }
     };
     static ThreadLocalStorage<Scheduler *> t_scheduler;
     static ThreadLocalStorage<Fiber *> t_fiber;
-    boost::mutex m_mutex;
+    std::mutex m_mutex;
     std::list<FiberAndThread> m_fibers;
     tid_t m_rootThread;
     std::shared_ptr<Fiber> m_rootFiber;

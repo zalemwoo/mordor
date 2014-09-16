@@ -131,7 +131,7 @@ SocketStreamBroker::getStream(const URI &uri)
             socket = (*it)->createSocket(SOCK_STREAM);
         std::list<Socket::ptr>::iterator it2;
         {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             if (m_cancelled)
                 MORDOR_THROW_EXCEPTION(OperationAbortedException());
             m_pending.push_back(socket);
@@ -149,11 +149,11 @@ SocketStreamBroker::getStream(const URI &uri)
                 m_filterNetworkCallback(socket);
             }
             socket->connect(*it);
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_pending.erase(it2);
             break;
         } catch (...) {
-            boost::mutex::scoped_lock lock(m_mutex);
+            std::lock_guard<std::mutex> lock(m_mutex);
             m_pending.erase(it2);
             if (++it == addresses.end())
                 throw;
@@ -167,7 +167,7 @@ SocketStreamBroker::getStream(const URI &uri)
 void
 SocketStreamBroker::cancelPending()
 {
-    boost::mutex::scoped_lock lock(m_mutex);
+    std::lock_guard<std::mutex> lock(m_mutex);
     m_cancelled = true;
     for (std::list<Socket::ptr>::iterator it(m_pending.begin());
         it != m_pending.end();

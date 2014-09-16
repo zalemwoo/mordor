@@ -2,9 +2,8 @@
 #define __MORDOR_HTTP_CONNECTION_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
+#include <mutex>
 #include <boost/function.hpp>
-#include <boost/shared_ptr.hpp>
-#include <boost/thread/mutex.hpp>
 
 #include "mordor/anymap.h"
 #include "http.h"
@@ -28,13 +27,13 @@ public:
 
     /// @note Be sure to lock the cacheMutex whenever you access the cache
     anymap &cache() { return m_cache; }
-    boost::mutex &cacheMutex() { return m_cacheMutex; }
+    std::mutex &cacheMutex() { return m_cacheMutex; }
 
     /// lock cacheMutex and return a copy of value
     template <class TagType>
     typename TagType::value_type getCache(const TagType &key)
     {
-        boost::mutex::scoped_lock lock(m_cacheMutex);
+        std::lock_guard<std::mutex> lock(m_cacheMutex);
         return m_cache[key];
     }
 
@@ -42,7 +41,7 @@ public:
     template <class TagType>
     void setCache(const TagType &key, const typename TagType::value_type& value)
     {
-        boost::mutex::scoped_lock lock(m_cacheMutex);
+        std::lock_guard<std::mutex> lock(m_cacheMutex);
         m_cache[key] = value;
     }
 
@@ -61,7 +60,7 @@ protected:
     std::shared_ptr<Stream> m_stream;
 
 private:
-    boost::mutex m_cacheMutex;
+    std::mutex m_cacheMutex;
     anymap m_cache;
 };
 

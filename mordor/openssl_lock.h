@@ -2,9 +2,9 @@
 #define __MORDOR_OPENSSL_LOCK_H__
 
 #include <vector>
+#include <mutex>
 
 #include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 
 #ifndef USE_FIBER_MUTEX
 namespace boost {
@@ -22,7 +22,7 @@ class OpensslLockManager : public boost::noncopyable
 {
 public:
 #ifndef USE_FIBER_MUTEX
-    typedef boost::mutex LockType;
+    typedef std::mutex LockType;
 #else
     typedef Mordor::FiberMutex LockType;
 #endif
