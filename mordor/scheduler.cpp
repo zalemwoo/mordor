@@ -270,7 +270,7 @@ Scheduler::run()
                     throw boost::enable_current_exception(
                         OperationAbortedException());
                 } catch(...) {
-                    idleFiber->inject(std::current_exception());
+                    idleFiber->inject(boost::current_exception());
                 }
                 // Detach our thread
                 for (std::vector<std::shared_ptr<Thread> >

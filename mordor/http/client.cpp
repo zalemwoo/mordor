@@ -1188,7 +1188,7 @@ ClientRequest::ensureResponse()
             throw;
         }
     } catch (...) {
-        m_priorResponseException = std::current_exception();
+        m_priorResponseException = boost::current_exception();
         throw;
     }
 }

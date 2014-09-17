@@ -35,7 +35,7 @@ std::string to_string( const std::vector<void *> bt );
 std::string to_string( errinfo_backtrace const &bt );
 
 std::vector<void *> backtrace(int framesToSkip = 0);
-void removeTopFrames(std::exception &ex, int framesToSkip = 0);
+void removeTopFrames(boost::exception &ex, int framesToSkip = 0);
 
 #define MORDOR_THROW_EXCEPTION(x)                                               \
     throw ::boost::enable_current_exception(::boost::enable_error_info(x))      \
@@ -44,7 +44,7 @@ void removeTopFrames(std::exception &ex, int framesToSkip = 0);
         << ::boost::throw_line((int)__LINE__)                                   \
         << ::Mordor::errinfo_backtrace(::Mordor::backtrace())
 
-void rethrow_exception(std::exception_ptr const & ep);
+void rethrow_exception(boost::exception_ptr const & ep);
 
 struct Exception : virtual boost::exception, virtual std::exception {};
 

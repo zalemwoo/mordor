@@ -39,7 +39,7 @@ public:
             try {
                 throw boost::enable_current_exception(CoroutineAbortedException());
             } catch (...) {
-                m_fiber->inject(std::current_exception());
+                m_fiber->inject(boost::current_exception());
             }
         }
         m_fiber->reset(std::bind(&Coroutine::run, this));
@@ -114,7 +114,7 @@ public:
             try {
                 throw boost::enable_current_exception(CoroutineAbortedException());
             } catch (...) {
-                m_fiber->inject(std::current_exception());
+                m_fiber->inject(boost::current_exception());
             }
         }
         m_fiber->reset(std::bind(&Coroutine::run, this));
@@ -185,7 +185,7 @@ public:
             try {
                 throw boost::enable_current_exception(CoroutineAbortedException());
             } catch (...) {
-                m_fiber->inject(std::current_exception());
+                m_fiber->inject(boost::current_exception());
             }
         }
         m_fiber->reset(std::bind(&Coroutine::run, this));

@@ -694,7 +694,7 @@ RequestBrokerFilter::parent()
 static void doBody(ClientRequest::ptr request,
     boost::function<void (ClientRequest::ptr)> bodyDg,
     Future<> &future,
-    std::exception_ptr &exception, bool &exceptionWasHttp)
+    boost::exception_ptr &exception, bool &exceptionWasHttp)
 {
     exceptionWasHttp = false;
     try {
@@ -707,14 +707,14 @@ static void doBody(ClientRequest::ptr request,
         // a response (since the request object is still in scope by the
         // caller, it won't do this automatically)
         request->cancel();
-        exception = std::current_exception();
+        exception = boost::current_exception();
     } catch (...) {
         exceptionWasHttp = request->requestState() == ClientRequest::ERROR;
         // Make sure the request is fully aborted so we don't hang waiting for
         // a response (since the request object is still in scope by the
         // caller, it won't do this automatically)
         request->cancel();
-        exception = std::current_exception();
+        exception = boost::current_exception();
     }
     future.signal();
 }
@@ -771,7 +771,7 @@ BaseRequestBroker::request(Request &requestHeaders, bool forceNewConnection,
             throw;
         }
         Future<> future;
-        std::exception_ptr exception;
+        boost::exception_ptr exception;
         bool exceptionWasHttp = false;
         if (bodyDg)
             Scheduler::getThis()->schedule(boost::bind(&doBody,
@@ -781,7 +781,7 @@ BaseRequestBroker::request(Request &requestHeaders, bool forceNewConnection,
         try {
             // Force reading the response here to check for connectivity problems
             request->response();
-        } catch (std::exception &ex) {
+        } catch (boost::exception &ex) {
 #if 0 // Zs
             ex << errinfo_source(HTTP);
 #endif // Ze

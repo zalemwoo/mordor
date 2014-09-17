@@ -56,7 +56,7 @@ template<class Iterator, class Functor>
 static
 void
 parallel_foreach_impl(Iterator &begin, Iterator &end, Functor &functor,
-                      std::mutex &mutex, std::exception_ptr &exception,
+                      std::mutex &mutex, boost::exception_ptr &exception,
                       Scheduler *scheduler, Fiber::ptr caller, int &count)
 {
     while (true) {
@@ -69,14 +69,14 @@ parallel_foreach_impl(Iterator &begin, Iterator &end, Functor &functor,
                 it = begin++;
             }
             functor(*it);
-        } catch (std::exception &ex) {
+        } catch (boost::exception &ex) {
             removeTopFrames(ex);
             std::lock_guard<std::mutex> lock(mutex);
-            exception = std::current_exception();
+            exception = boost::current_exception();
             break;
         } catch (...) {
             std::lock_guard<std::mutex> lock(mutex);
-            exception = std::current_exception();
+            exception = boost::current_exception();
             break;
         }
     }
@@ -123,7 +123,7 @@ parallel_foreach(Iterator begin, Iterator end, Functor functor,
     }
 
     std::mutex mutex;
-    std::exception_ptr exception;
+    boost::exception_ptr exception;
     MORDOR_LOG_DEBUG(Detail::getLogger()) << " running parallel_for with "
         << parallelism << " fibers";
     int count = parallelism;

@@ -455,11 +455,11 @@ MORDOR_UNITTEST(Fibers, fiberThrowingExceptionOutOfScope)
 MORDOR_UNITTEST(Fibers, forceThrowExceptionNewFiberCall)
 {
     Fiber::ptr f(new Fiber(&throwRuntimeError));
-    std::exception_ptr exception;
+    boost::exception_ptr exception;
     try {
         throw boost::enable_current_exception(DummyException());
     } catch (...) {
-        exception = std::current_exception();
+        exception = boost::current_exception();
     }
     MORDOR_TEST_ASSERT_EXCEPTION(f->inject(exception), DummyException);
 }
@@ -478,11 +478,11 @@ static void catchAndThrowDummy()
 MORDOR_UNITTEST(Fibers, forceThrowExceptionFiberYield)
 {
     Fiber::ptr f(new Fiber(&catchAndThrowDummy));
-    std::exception_ptr exception;
+    boost::exception_ptr exception;
     try {
         throw boost::enable_current_exception(DummyException());
     } catch (...) {
-        exception = std::current_exception();
+        exception = boost::current_exception();
     }
     f->call();
     MORDOR_TEST_ASSERT_EXCEPTION(f->inject(exception), DummyException);
@@ -504,11 +504,11 @@ MORDOR_UNITTEST(Fibers, forceThrowExceptionFiberYieldTo)
     Fiber::ptr mainFiber = Fiber::getThis();
     Fiber::ptr f(new Fiber(boost::bind(&catchAndThrowDummyYieldTo,
         mainFiber)));
-    std::exception_ptr exception;
+    boost::exception_ptr exception;
     try {
         throw boost::enable_current_exception(DummyException());
     } catch (...) {
-        exception = std::current_exception();
+        exception = boost::current_exception();
     }
     f->yieldTo();
     MORDOR_TEST_ASSERT_EXCEPTION(f->inject(exception), DummyException);

@@ -406,7 +406,7 @@ IOManager::idle()
             expired.clear();
         }
 
-        std::exception_ptr exception;
+        boost::exception_ptr exception;
         for(int i = 0; i < rc; ++i) {
             epoll_event &event = events[i];
             if (event.data.fd == m_tickleFds[0]) {
@@ -454,8 +454,8 @@ IOManager::idle()
             if (rc2) {
                 try {
                     MORDOR_THROW_EXCEPTION_FROM_LAST_ERROR_API("epoll_ctl");
-                } catch (std::exception &) {
-                    exception = std::current_exception();
+                } catch (boost::exception &) {
+                    exception = boost::current_exception();
                     continue;
                 }
             }
@@ -469,7 +469,7 @@ IOManager::idle()
             MORDOR_ASSERT(triggered);
         }
         if (exception)
-            std::rethrow_exception(exception);
+            boost::rethrow_exception(exception);
         try {
             Fiber::yield();
         } catch (OperationAbortedException &) {

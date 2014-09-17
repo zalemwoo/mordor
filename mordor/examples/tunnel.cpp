@@ -25,7 +25,7 @@ static void shuttleData(Stream::ptr oneEnd, Stream::ptr otherEnd)
         transferStream(oneEnd, otherEnd);
         if (otherEnd->supportsHalfClose())
             otherEnd->close(Stream::WRITE);
-    } catch (std::exception &) {
+    } catch (boost::exception &) {
         if (oneEnd->supportsHalfClose())
             oneEnd->close(Stream::READ);
     }
@@ -51,7 +51,7 @@ static void outgoingConnection(Stream::ptr client, IOManager &ioManager,
             try {
                 sock->connect(*it);
                 break;
-            } catch (std::exception &) {
+            } catch (boost::exception &) {
                 if (++it == addresses.end())
                     throw;
                 sock.reset();

@@ -111,7 +111,7 @@ private:
     Future<> m_writeFuture, m_writeFuture2;
     std::shared_ptr<HTTP::ClientRequest> m_writeRequest;
     std::shared_ptr<HTTP::ClientRequest> m_readRequest;
-    std::exception_ptr m_writeException;
+    boost::exception_ptr m_writeException;
 };
 
 }

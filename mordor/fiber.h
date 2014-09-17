@@ -114,7 +114,7 @@ public:
     /// yieldTo(), exception is rethrown in the Fiber
     /// @param exception The exception to be rethrown in the Fiber
     /// @pre state() == INIT || state() == HOLD
-    void inject(std::exception_ptr exception);
+    void inject(boost::exception_ptr exception);
 
     /// Yield execution to a specific Fiber
 
@@ -183,7 +183,7 @@ private:
     State m_state, m_yielderNextState;
     ptr m_outer, m_yielder;
     weak_ptr m_terminateOuter;
-    std::exception_ptr m_exception;
+    boost::exception_ptr m_exception;
 
     static ThreadLocalStorage<Fiber *> t_fiber;
 

@@ -127,9 +127,9 @@ std::vector<void *> backtrace(int framesToSkip)
     return result;
 }
 
-void removeTopFrames(std::exception &ex, int framesToSkip)
+void removeTopFrames(boost::exception &ex, int framesToSkip)
 {
-#if 0 // Zs
+#if 1 // Zs
     const std::vector<void *> *oldbt = boost::get_error_info<errinfo_backtrace>(ex);
     if (oldbt && !oldbt->empty()) {
         std::vector<void *> newbt(*oldbt);
@@ -148,15 +148,15 @@ void removeTopFrames(std::exception &ex, int framesToSkip)
 #endif // Zs
 }
 
-void rethrow_exception(std::exception_ptr const & ep)
+void rethrow_exception(boost::exception_ptr const & ep)
 {
     // Take the backtrace from here, to avoid additional frames from the
     // exception handler
     std::vector<void *> bt = backtrace(1);
     try {
-        std::rethrow_exception(ep);
-    } catch (std::exception &e) {
-#if 0 // Zs
+        boost::rethrow_exception(ep);
+    } catch (boost::exception &e) {
+#if 1 // Zs
         const std::vector<void *> *oldbt =
             boost::get_error_info<errinfo_backtrace>(e);
         if (oldbt)
