@@ -4,7 +4,6 @@
 
 #include <boost/lexical_cast.hpp>
 #include <boost/scoped_array.hpp>
-#include <boost/shared_array.hpp>
 
 #include "mordor/exception.h"
 #include "mordor/fiber.h"
@@ -339,7 +338,7 @@ MORDOR_UNITTEST(Socket, exceedIOVMAX)
 
     const char * buf = "abcd";
     size_t n = IOV_MAX + 1, len = 4;
-    boost::shared_array<iovec> iovs(new iovec[n]);
+    std::unique_ptr<iovec[]> iovs(new iovec[n]);
     for (size_t i = 0 ; i < n; ++i) {
         iovs[i].iov_base = (void*)buf;
         iovs[i].iov_len = len;
@@ -382,9 +381,9 @@ static void receiveFiber(Socket::ptr listen, size_t &sent, int &sequence)
     // Let the main fiber take control again until he "blocks"
     Scheduler::yieldTo();
     MORDOR_TEST_ASSERT_EQUAL(++sequence, 13);
-    boost::shared_array<char> receivebuf2;
+    std::shared_ptr<char> receivebuf2;
     if (sent > 0u) {
-        receivebuf2.reset(new char[sent]);
+        receivebuf2.reset(new char[sent], std::default_delete<char[]>());
         while (sent > 0u)
             sent -= sock->receive(receivebuf2.get(), sent);
     }
@@ -393,7 +392,7 @@ static void receiveFiber(Socket::ptr listen, size_t &sent, int &sequence)
     MORDOR_TEST_ASSERT_EQUAL(++sequence, 15);
 
     if (sent > 0u) {
-        receivebuf2.reset(new char[sent]);
+        receivebuf2.reset(new char[sent], std::default_delete<char[]>());
         while (sent > 0u)
             sent -= sock->receive(receivebuf2.get(), sent);
     }
@@ -402,7 +401,7 @@ static void receiveFiber(Socket::ptr listen, size_t &sent, int &sequence)
     Scheduler::yieldTo();
     MORDOR_TEST_ASSERT_EQUAL(++sequence, 17);
     if (sent > 0u) {
-        receivebuf2.reset(new char[std::max<size_t>(sent, 3u)]);
+        receivebuf2.reset(new char[std::max<size_t>(sent, 3u)], std::default_delete<char[]>());
         iov[0].iov_base = &receivebuf2.get()[0];
         iov[1].iov_base = &receivebuf2.get()[2];
         while (sent > 0u) {
@@ -421,7 +420,7 @@ static void receiveFiber(Socket::ptr listen, size_t &sent, int &sequence)
     MORDOR_TEST_ASSERT_EQUAL(++sequence, 19);
 
     if (sent > 0u) {
-        receivebuf2.reset(new char[std::max<size_t>(sent, 3u)]);
+        receivebuf2.reset(new char[std::max<size_t>(sent, 3u)], std::default_delete<char[]>());
         iov[0].iov_base = &receivebuf2.get()[0];
         iov[1].iov_base = &receivebuf2.get()[2];
         iov[0].iov_len = 2;

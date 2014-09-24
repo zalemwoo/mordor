@@ -30,7 +30,7 @@ Buffer::SegmentData::SegmentData()
 
 Buffer::SegmentData::SegmentData(size_t length)
 {
-    m_array.reset(new unsigned char[length]);
+    m_array.reset(new unsigned char[length], std::default_delete<unsigned char[]>());
     start(m_array.get());
     this->length(length);
 }

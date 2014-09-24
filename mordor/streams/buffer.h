@@ -4,7 +4,6 @@
 #include <list>
 #include <vector>
 
-#include <boost/shared_array.hpp>
 #include <boost/function.hpp>
 
 #include "mordor/socket.h"
@@ -37,7 +36,7 @@ private:
         void *m_start;
         size_t m_length;
     private:
-        boost::shared_array<unsigned char> m_array;
+        std::shared_ptr<unsigned char> m_array;
     };
 
     struct Segment

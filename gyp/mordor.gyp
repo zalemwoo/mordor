@@ -190,6 +190,10 @@
         '../mordor/tests/fibers.cpp',
         '../mordor/tests/fibersync.cpp',
         '../mordor/tests/log.cpp',
+        '../mordor/tests/stream.cpp',
+        '../mordor/tests/socket.cpp',
+        '../mordor/tests/thread.cpp',
+        '../mordor/tests/zlib.cpp',
         '../mordor/tests/run_tests.cpp',
       ],
     }, # tests
