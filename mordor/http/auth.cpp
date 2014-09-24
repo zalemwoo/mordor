@@ -8,6 +8,7 @@
 #include "mordor/socket.h"
 
 #ifdef WINDOWS
+#include <memory>
 #include "negotiate.h"
 #elif defined (OSX)
 #include "mordor/util.h"
@@ -44,7 +45,7 @@ AuthRequestBroker::request(Request &requestHeaders, bool forceNewConnection,
     std::string scheme, realm, username, password;
     size_t attempts = 0, proxyAttempts = 0;
 #ifdef WINDOWS
-    boost::scoped_ptr<NegotiateAuth> negotiateAuth, negotiateProxyAuth;
+    std::unique_ptr<NegotiateAuth> negotiateAuth, negotiateProxyAuth;
 #endif
     while (true) {
 #ifdef WINDOWS

@@ -94,7 +94,6 @@
 #if !defined(GCC) || defined(__clang__)
 #include <boost/bind.hpp>
 #endif
-#include <boost/scoped_ptr.hpp>
 #include <boost/shared_array.hpp>
 #include <boost/blank.hpp>
 #include <boost/exception/all.hpp>
@@ -105,8 +104,6 @@
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/member.hpp>
 #include <boost/signals2/signal.hpp>
-#include <boost/thread/mutex.hpp>
-#include <boost/thread/tss.hpp>
 #include <boost/variant.hpp>
 
 // Non-CRT C headers

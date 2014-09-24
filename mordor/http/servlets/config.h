@@ -2,8 +2,6 @@
 #define __MORDOR_HTTP_SERVLETS_CONFIG_H__
 // Copyright (c) 2010 - Mozy, Inc.
 
-#include <boost/shared_ptr.hpp>
-
 #include "mordor/http/servlet.h"
 
 namespace Mordor {

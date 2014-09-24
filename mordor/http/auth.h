@@ -3,7 +3,6 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <boost/function.hpp>
-#include <boost/scoped_ptr.hpp>
 
 #include "mordor/util.h"
 #include "broker.h"

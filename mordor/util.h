@@ -4,8 +4,6 @@
 
 #include "version.h"
 
-#include <boost/shared_ptr.hpp>
-
 #ifdef OSX
 #include <CoreFoundation/CFBase.h>
 #endif

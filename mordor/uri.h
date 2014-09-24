@@ -5,8 +5,6 @@
 #include <string>
 #include <vector>
 
-#include <boost/shared_ptr.hpp>
-
 #include "assert.h"
 #include "mordor/string.h"
 

@@ -2,8 +2,6 @@
 #define __MORDOR_SOCKS_H__
 // Copyright (c) 2010 - Mozy, Inc.
 
-#include <boost/shared_ptr.hpp>
-
 #include "mordor/exception.h"
 
 namespace Mordor {

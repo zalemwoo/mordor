@@ -1,7 +1,6 @@
 #ifndef __MORDOR_TEST_COMPOUND_LISTENER_H__
 #define __MORDOR_TEST_COMPOUND_LISTENER_H__
 
-#include <boost/shared_ptr.hpp>
 #include <vector>
 
 #include "test.h"

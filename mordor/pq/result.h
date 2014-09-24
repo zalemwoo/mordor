@@ -2,8 +2,6 @@
 #define __MORDOR_PQ_RESULT_H__
 // Copyright (c) 2010 - Mozy, Inc.
 
-#include <boost/shared_ptr.hpp>
-
 #include <libpq-fe.h>
 
 namespace Mordor {

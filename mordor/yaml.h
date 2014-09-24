@@ -4,8 +4,6 @@
 
 #include <string>
 
-#include <boost/shared_ptr.hpp>
-
 #include "exception.h"
 #include "json.h"
 

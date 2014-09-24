@@ -4,8 +4,6 @@
 
 #include <utility>
 
-#include <boost/shared_ptr.hpp>
-
 namespace Mordor {
 
 class Stream;

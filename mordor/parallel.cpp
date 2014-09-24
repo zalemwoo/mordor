@@ -2,7 +2,7 @@
 
 #include "parallel.h"
 
-#include <boost/scoped_ptr.hpp>
+#include <memory>
 
 #include "assert.h"
 #include "atomic.h"
@@ -51,7 +51,7 @@ parallel_do(const std::vector<boost::function<void ()> > &dgs,
     }
 
     MORDOR_ASSERT(parallelism != 0);
-    boost::scoped_ptr<FiberSemaphore> sem;
+    std::unique_ptr<FiberSemaphore> sem;
     if (parallelism != -1)
         sem.reset(new FiberSemaphore(parallelism));
 
@@ -96,7 +96,7 @@ parallel_do(const std::vector<boost::function<void ()> > &dgs,
         return;
     }
 
-    boost::scoped_ptr<FiberSemaphore> sem;
+    std::unique_ptr<FiberSemaphore> sem;
     MORDOR_ASSERT(parallelism != 0);
     if (parallelism != -1)
         sem.reset(new FiberSemaphore(parallelism));
