@@ -52,5 +52,7 @@ xcuserdata
 tags
 test-results/
 
+out
+
 .project
 .cproject
