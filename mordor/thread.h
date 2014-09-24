@@ -5,12 +5,13 @@
 #include <iosfwd>
 
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
 
 #include "version.h"
 #ifndef WINDOWS
 #include "semaphore.h"
 #endif
+
+#include "util.h"
 
 namespace Mordor {
 
@@ -29,7 +30,7 @@ tid_t gettid();
 
 class Scheduler;
 
-class Thread : boost::noncopyable
+class Thread : Mordor::noncopyable
 {
 public:
     /// thread bookmark

@@ -5,7 +5,7 @@
 #include <list>
 #include <mutex>
 
-#include <boost/noncopyable.hpp>
+#include "util.h"
 
 namespace Mordor {
 
@@ -66,7 +66,7 @@ private:
 /// if the mutex cannot be immediately acquired.  It also provides the
 /// additional guarantee that it is strictly FIFO, instead of random which
 /// Fiber will acquire the mutex next after it is released.
-struct FiberMutex : boost::noncopyable
+struct FiberMutex : Mordor::noncopyable
 {
     friend struct FiberCondition;
 public:
@@ -101,7 +101,7 @@ private:
     std::list<std::pair<Scheduler *, std::shared_ptr<Fiber> > > m_waiters;
 };
 
-struct RecursiveFiberMutex : boost::noncopyable
+struct RecursiveFiberMutex : Mordor::noncopyable
 {
 public:
     typedef ScopedLockImpl<RecursiveFiberMutex> ScopedLock;
@@ -141,7 +141,7 @@ private:
 /// if the mutex cannot be immediately acquired.  It also provides the
 /// additional guarantee that it is strictly FIFO, instead of random which
 /// Fiber will acquire the semaphore next after it is released.
-struct FiberSemaphore : boost::noncopyable
+struct FiberSemaphore : Mordor::noncopyable
 {
 public:
     FiberSemaphore(size_t initialConcurrency = 0);
@@ -169,7 +169,7 @@ private:
 /// It also provides the additional guarantee that it is strictly FIFO,
 /// instead of random which waiting Fiber will be released when the condition
 /// is signalled.
-struct FiberCondition : boost::noncopyable
+struct FiberCondition : Mordor::noncopyable
 {
 public:
     /// @param mutex The mutex to associate with the Condition
@@ -203,7 +203,7 @@ private:
 /// It also provides the additional guarantee that it is strictly FIFO,
 /// instead of random which waiting Fiber will be released when the event
 /// is signalled.
-struct FiberEvent : boost::noncopyable
+struct FiberEvent : Mordor::noncopyable
 {
 public:
     /// @param autoReset If the Event should automatically reset itself

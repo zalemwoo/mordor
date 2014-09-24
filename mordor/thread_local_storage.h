@@ -4,7 +4,7 @@
 
 #include "predef.h"
 
-#include <boost/noncopyable.hpp>
+#include "util.h"
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -17,7 +17,7 @@
 namespace Mordor {
 
 template <class T>
-class ThreadLocalStorageBase : boost::noncopyable
+class ThreadLocalStorageBase : Mordor::noncopyable
 {
 public:
     ThreadLocalStorageBase()

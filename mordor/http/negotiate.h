@@ -6,7 +6,7 @@
 
 #include <string>
 
-#include <boost/noncopyable.hpp>
+#include "mordor/util.h"
 
 namespace Mordor {
 
@@ -18,7 +18,7 @@ struct AuthParams;
 struct Request;
 struct Response;
 
-class NegotiateAuth : public boost::noncopyable
+class NegotiateAuth : public Mordor::noncopyable
 {
 public:
     NegotiateAuth(const std::string &username, const std::string &password);

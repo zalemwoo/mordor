@@ -2,9 +2,9 @@
 #define __MORDOR_PQ_CONNECTION_H__
 // Copyright (c) 2010 Mozy, Inc.
 
-#include <boost/noncopyable.hpp>
 #include <boost/date_time/posix_time/posix_time_types.hpp>
 
+#include "mordor/util.h"
 #include "exception.h"
 #include "preparedstatement.h"
 
@@ -14,7 +14,7 @@ class Stream;
 
 namespace PQ {
 
-class Connection : boost::noncopyable
+class Connection : Mordor::noncopyable
 {
 public:
     Connection(const std::string &conninfo, IOManager *ioManager = NULL,

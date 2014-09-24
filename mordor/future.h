@@ -4,8 +4,7 @@
 
 #include <bitset>
 
-#include <boost/noncopyable.hpp>
-
+#include "util.h"
 #include "assert.h"
 #include "atomic.h"
 #include "fiber.h"
@@ -16,7 +15,7 @@ namespace Mordor {
 struct Void;
 
 template <class T = Void>
-class Future : boost::noncopyable
+class Future : Mordor::noncopyable
 {
     template <class Iterator>
     friend void waitAll(Iterator start, Iterator end);
@@ -105,7 +104,7 @@ private:
 };
 
 template <>
-class Future<Void> : boost::noncopyable
+class Future<Void> : Mordor::noncopyable
 {
     template <class Iterator>
     friend void waitAll(Iterator start, Iterator end);

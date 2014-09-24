@@ -3,8 +3,7 @@
 
 #include <list>
 
-#include <boost/shared_ptr.hpp>
-
+#include "mordor/util.h"
 #include "mordor/fibersynchronization.h"
 
 namespace Mordor {
@@ -15,7 +14,7 @@ namespace PQ {
 
 class Connection;
 
-class ConnectionPool : boost::noncopyable {
+class ConnectionPool : Mordor::noncopyable {
 public:
     typedef std::shared_ptr<ConnectionPool> ptr;
 

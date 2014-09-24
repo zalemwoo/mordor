@@ -2,8 +2,7 @@
 #define __MORDOR_COROUTINE_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
-#include <boost/noncopyable.hpp>
-
+#include "util.h"
 #include "exception.h"
 #include "fiber.h"
 
@@ -14,7 +13,7 @@ struct DummyVoid;
 struct CoroutineAbortedException : virtual OperationAbortedException {};
 
 template <class Result, class Arg = DummyVoid>
-class Coroutine : boost::noncopyable
+class Coroutine : Mordor::noncopyable
 {
 public:
     Coroutine()
@@ -89,7 +88,7 @@ private:
 
 
 template <class Result>
-class Coroutine<Result, DummyVoid> : boost::noncopyable
+class Coroutine<Result, DummyVoid> : Mordor::noncopyable
 {
 public:
     Coroutine()
@@ -160,7 +159,7 @@ private:
 };
 
 template <class Arg>
-class Coroutine<void, Arg> : boost::noncopyable
+class Coroutine<void, Arg> : Mordor::noncopyable
 {
 public:
     Coroutine()

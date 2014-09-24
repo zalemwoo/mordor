@@ -4,10 +4,9 @@
 
 #include <string>
 
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
+#include "mordor/util.h"
 #include "mordor/predef.h"
 
 namespace Mordor {
@@ -26,7 +25,7 @@ struct Buffer;
 /// and it is safe to call read() at the same time as write() (assuming the
 /// Stream supports both, and don't supportSeek()).  read() and write() are
 /// @b not re-entrant.
-class Stream : boost::noncopyable
+class Stream : Mordor::noncopyable
 {
 public:
     typedef std::shared_ptr<Stream> ptr;

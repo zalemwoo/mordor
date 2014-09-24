@@ -14,10 +14,10 @@
 #include <boost/multi_index_container.hpp>
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/signals2/signal.hpp>
 
 #include "assert.h"
+#include "util.h"
 
 namespace Mordor {
 
@@ -111,7 +111,7 @@ APIs used during the regular software flow.
 /// @return if @p name is a valid ConfigVar name
 bool isValidConfigVarName(const std::string &name, bool allowDot = true);
 
-class ConfigVarBase : public boost::noncopyable
+class ConfigVarBase : public Mordor::noncopyable
 {
 public:
     typedef std::shared_ptr<ConfigVarBase> ptr;

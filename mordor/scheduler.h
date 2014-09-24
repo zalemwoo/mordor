@@ -6,8 +6,8 @@
 #include <mutex>
 
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
 
+#include "util.h"
 #include "thread.h"
 #include "thread_local_storage.h"
 
@@ -27,7 +27,7 @@ class Fiber;
 /// there are no more Fibers scheduled, and return from yieldTo() or
 /// dispatch(). Hybrid and spawned Schedulers must be explicitly stopped via
 /// stop(). stop() will return only after there are no more Fibers scheduled.
-class Scheduler : public boost::noncopyable
+class Scheduler : public Mordor::noncopyable
 {
 public:
     /// Default constructor
@@ -235,7 +235,7 @@ private:
 
 /// Automatically returns to Scheduler::getThis() when goes out of scope
 /// (by calling Scheduler::switchTo())
-struct SchedulerSwitcher : public boost::noncopyable
+struct SchedulerSwitcher : public Mordor::noncopyable
 {
 public:
     /// Captures Scheduler::getThis(), and optionally calls target->switchTo()

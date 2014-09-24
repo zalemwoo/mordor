@@ -3,8 +3,7 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include "version.h"
-
-#include <boost/noncopyable.hpp>
+#include "util.h"
 
 #ifdef WINDOWS
 #include <windows.h>
@@ -17,7 +16,7 @@
 
 namespace Mordor {
 
-class Semaphore : boost::noncopyable
+class Semaphore : Mordor::noncopyable
 {
 public:
     Semaphore(unsigned int count = 0);

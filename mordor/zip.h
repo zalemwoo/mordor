@@ -2,9 +2,7 @@
 #define __MORDOR_ZIP_H__
 // Copyright (c) 2010 - Mozy, Inc.
 
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
-
+#include "util.h"
 #include "exception.h"
 
 namespace Mordor {
@@ -73,7 +71,7 @@ private:
     unsigned short m_extraFieldsLength;
 };
 
-class ZipEntries : public std::multimap<std::string, ZipEntry>, boost::noncopyable
+class ZipEntries : public std::multimap<std::string, ZipEntry>, Mordor::noncopyable
 {};
 
 /// @brief Zip Archive Format access
@@ -118,7 +116,7 @@ class ZipEntries : public std::multimap<std::string, ZipEntry>, boost::noncopyab
 /// }
 /// zip.close();
 /// @endcode
-class Zip : boost::noncopyable
+class Zip : Mordor::noncopyable
 {
     friend class ZipEntry;
 public:

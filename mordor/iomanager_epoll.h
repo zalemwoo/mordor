@@ -4,6 +4,8 @@
 
 #include <mutex>
 
+#include "util.h"
+
 #include "scheduler.h"
 #include "timer.h"
 #include "version.h"
@@ -27,7 +29,7 @@ public:
     };
 
 private:
-    struct AsyncState : boost::noncopyable
+    struct AsyncState : Mordor::noncopyable
     {
         AsyncState();
         ~AsyncState();

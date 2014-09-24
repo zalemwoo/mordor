@@ -4,11 +4,9 @@
 
 #include <vector>
 
-#include <boost/enable_shared_from_this.hpp>
-#include <boost/noncopyable.hpp>
-#include <boost/shared_ptr.hpp>
 #include <boost/signals2/signal.hpp>
 
+#include "util.h"
 #include "endian.h"
 #include "exception.h"
 #include "version.h"
@@ -69,7 +67,7 @@ struct TimedOutException : virtual SocketException {};
 
 struct Address;
 
-class Socket : public std::enable_shared_from_this<Socket>, boost::noncopyable
+class Socket : public std::enable_shared_from_this<Socket>, Mordor::noncopyable
 {
 public:
     typedef std::shared_ptr<Socket> ptr;

@@ -3,6 +3,8 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <list>
+
+#include "util.h"
 #include "exception.h"
 #include "thread_local_storage.h"
 #include "version.h"
@@ -199,7 +201,7 @@ private:
 std::ostream &operator<<(std::ostream &os, Fiber::State state);
 
 template <class T>
-class FiberLocalStorageBase : boost::noncopyable
+class FiberLocalStorageBase : Mordor::noncopyable
 {
 public:
     FiberLocalStorageBase()

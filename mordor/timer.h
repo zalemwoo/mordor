@@ -6,13 +6,13 @@
 #include <vector>
 #include <mutex>
 
-#include <boost/noncopyable.hpp>
+#include "util.h"
 
 namespace Mordor {
 
 class TimerManager;
 
-class Timer : public boost::noncopyable, public std::enable_shared_from_this<Timer>
+class Timer : public Mordor::noncopyable, public std::enable_shared_from_this<Timer>
 {
     friend class TimerManager;
 public:
@@ -54,7 +54,7 @@ private:
 
 };
 
-class TimerManager : public boost::noncopyable
+class TimerManager : public Mordor::noncopyable
 {
     friend class Timer;
 public:

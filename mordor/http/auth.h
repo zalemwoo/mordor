@@ -3,9 +3,9 @@
 // Copyright (c) 2009 - Mozy, Inc.
 
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/scoped_ptr.hpp>
 
+#include "mordor/util.h"
 #include "broker.h"
 #include "mordor/version.h"
 

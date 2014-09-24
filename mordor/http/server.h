@@ -4,6 +4,7 @@
 
 #include <boost/thread/recursive_mutex.hpp>
 
+#include "mordor/util.h"
 #include "connection.h"
 
 namespace Mordor {
@@ -16,7 +17,7 @@ namespace HTTP {
 
 class ServerConnection;
 
-class ServerRequest : public std::enable_shared_from_this<ServerRequest>, boost::noncopyable
+class ServerRequest : public std::enable_shared_from_this<ServerRequest>, Mordor::noncopyable
 {
 private:
     friend class ServerConnection;
@@ -142,7 +143,7 @@ private:
 /// ServerRequest::processNextRequest() must be called before the server will
 /// start reading a pipelined request.
 class ServerConnection : public Connection,
-    public std::enable_shared_from_this<ServerConnection>, boost::noncopyable
+    public std::enable_shared_from_this<ServerConnection>, Mordor::noncopyable
 {
 public:
     typedef std::shared_ptr<ServerConnection> ptr;

@@ -19,6 +19,15 @@
 
 namespace Mordor {
 
+class noncopyable
+{
+protected:
+    constexpr noncopyable() = default;
+    ~noncopyable() = default;
+    noncopyable( const noncopyable& ) = delete;
+    noncopyable& operator=( const noncopyable& ) = delete;
+};
+
 template <class T>
 void nop(const T &) {}
 

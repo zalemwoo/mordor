@@ -6,9 +6,9 @@
 
 #include <boost/enable_shared_from_this.hpp>
 #include <boost/function.hpp>
-#include <boost/noncopyable.hpp>
 #include <boost/shared_ptr.hpp>
 
+#include "mordor/util.h"
 #include "http.h"
 
 namespace Mordor {
@@ -21,7 +21,7 @@ struct MissingMultipartBoundaryException : virtual HTTP::Exception, virtual Stre
 struct InvalidMultipartBoundaryException : virtual HTTP::Exception
 {};
 
-class Multipart : public std::enable_shared_from_this<Multipart>, boost::noncopyable
+class Multipart : public std::enable_shared_from_this<Multipart>, Mordor::noncopyable
 {
     friend class BodyPart;
 public:

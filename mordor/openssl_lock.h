@@ -4,7 +4,7 @@
 #include <vector>
 #include <mutex>
 
-#include <boost/noncopyable.hpp>
+#include "util.h"
 
 #ifndef USE_FIBER_MUTEX
 namespace boost {
@@ -18,7 +18,7 @@ namespace Mordor {
 
 namespace Mordor {
 
-class OpensslLockManager : public boost::noncopyable
+class OpensslLockManager : public Mordor::noncopyable
 {
 public:
 #ifndef USE_FIBER_MUTEX

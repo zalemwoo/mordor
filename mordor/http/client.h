@@ -6,8 +6,7 @@
 #include <set>
 #include <mutex>
 
-#include <boost/noncopyable.hpp>
-
+#include "mordor/util.h"
 #include "connection.h"
 
 namespace Mordor {
@@ -24,7 +23,7 @@ namespace HTTP {
 
 class ClientConnection;
 
-class ClientRequest : public std::enable_shared_from_this<ClientRequest>, boost::noncopyable
+class ClientRequest : public std::enable_shared_from_this<ClientRequest>, Mordor::noncopyable
 {
 private:
     friend class ClientConnection;
@@ -144,7 +143,7 @@ private:
     ClientRequest::ptr m_request;
 };
 
-class ClientConnection : public Connection, public std::enable_shared_from_this<ClientConnection>, boost::noncopyable
+class ClientConnection : public Connection, public std::enable_shared_from_this<ClientConnection>, Mordor::noncopyable
 {
 private:
     friend class ClientRequest;
