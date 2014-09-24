@@ -6,7 +6,7 @@
 
 #include <iostream>
 
-#include <boost/regex.hpp>
+#include <regex>
 
 #include "mordor/config.h"
 #include "mordor/sleep.h"
@@ -162,17 +162,17 @@ testsForArguments(int argc, char **argv)
     TestSuites tests;
     const TestSuites &all = allTests();
     for (int i = 0; i < argc; ++i) {
-        boost::regex regex("^" + std::string(argv[i]) + "$");
+        std::regex regex("^" + std::string(argv[i]) + "$");
         for (TestSuites::const_iterator j(all.begin());
             j != all.end();
             ++j) {
-            if (boost::regex_match(j->first, regex)) {
+            if (std::regex_match(j->first, regex)) {
                 tests[j->first] = j->second;
             } else {
                 for (std::map<std::string, TestDg>::const_iterator k(j->second.second.begin());
                     k != j->second.second.end();
                     ++k) {
-                    if (boost::regex_match(j->first + "::" + k->first, regex)) {
+                    if (std::regex_match(j->first + "::" + k->first, regex)) {
                         tests[j->first].first = j->second.first;
                         tests[j->first].second[k->first] = k->second;
                     }

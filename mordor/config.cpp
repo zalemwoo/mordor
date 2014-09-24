@@ -4,7 +4,7 @@
 
 #include <algorithm>
 
-#include <boost/regex.hpp>
+#include <regex>
 #include <boost/thread/thread.hpp>
 
 #include "json.h"
@@ -32,12 +32,12 @@ static Logger::ptr g_log = Log::lookup("mordor:config");
 bool
 isValidConfigVarName(const std::string &name, bool allowDot)
 {
-    static const boost::regex regname("[a-z][a-z0-9]*");
-    static const boost::regex regnameDot("[a-z][a-z0-9]*(\\.[a-z0-9]+)*");
+    static const std::regex regname("[a-z][a-z0-9]*");
+    static const std::regex regnameDot("[a-z][a-z0-9]*(\\.[a-z0-9]+)*");
     if (allowDot)
-        return boost::regex_match(name, regnameDot);
+        return std::regex_match(name, regnameDot);
     else
-        return boost::regex_match(name, regname);
+        return std::regex_match(name, regname);
 }
 
 bool Config::s_locked = false;

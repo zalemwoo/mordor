@@ -2,7 +2,7 @@
 
 #include "proxy.h"
 #include <boost/algorithm/string.hpp>
-#include <boost/regex.hpp>
+#include <regex>
 #include "mordor/config.h"
 #include "mordor/http/broker.h"
 #include "mordor/http/client.h"
@@ -96,9 +96,9 @@ std::vector<URI> proxyFromList(const URI &uri,
         MORDOR_LOG_DEBUG(proxyLog) << "Considering proxy \"" << v[i] << "\".";
 
         // Match the scheme and the URI for each proxy in the list. See above.
-        static const boost::regex e("(?:([a-zA-Z]+)=)?(.*)");
-        boost::smatch m;
-        if (!boost::regex_match(v[i], m, e)) {
+        static const std::regex e("(?:([a-zA-Z]+)=)?(.*)");
+        std::smatch m;
+        if (!std::regex_match(v[i], m, e)) {
             MORDOR_LOG_DEBUG(proxyLog) << "Invalid proxy \"" << v[i] << "\".";
             continue;
         }
@@ -108,9 +108,9 @@ std::vector<URI> proxyFromList(const URI &uri,
             // scheme in the URI, so we use a regex here to parse it instead of
             // simply creating a Mordor::URI directly.
             std::string proxyURI = m[2].str();
-            static const boost::regex uriRegex("(?:[a-zA-Z]+://)?(.*)");
-            boost::smatch uriMatch;
-            if (!boost::regex_match(proxyURI, uriMatch, uriRegex)) {
+            static const std::regex uriRegex("(?:[a-zA-Z]+://)?(.*)");
+            std::smatch uriMatch;
+            if (!std::regex_match(proxyURI, uriMatch, uriRegex)) {
                 MORDOR_LOG_DEBUG(proxyLog) << "Invalid proxy \"" << v[i]
                                            << "\".";
                 continue;
@@ -603,9 +603,9 @@ bool isMatch(const URI& uri, const std::string& pattern)
     // List entries with multiple wildcards are not supported. Note that this
     // function also doesn't support CIDR-style IP address ranges, which are
     // supported by some browsers and operating systems.
-    boost::regex e("(?:([a-zA-Z]+)://)?(.*?)(?::(\\d+))?");
-    boost::smatch m;
-    if (!boost::regex_match(pattern, m, e)) {
+    std::regex e("(?:([a-zA-Z]+)://)?(.*?)(?::(\\d+))?");
+    std::smatch m;
+    if (!std::regex_match(pattern, m, e)) {
         MORDOR_LOG_DEBUG(proxyLog) << "Invalid rule \"" << pattern << "\".";
         return false;
     }
@@ -647,8 +647,8 @@ bool isMatch(const URI& uri, const std::string& pattern)
 
     boost::replace_all(patternAddress, ".", "\\.");
     boost::replace_all(patternAddress, "*", ".*");
-    boost::regex hostRegex(patternAddress, boost::regex::perl | boost::regex::icase);
-    if (!boost::regex_match(address, hostRegex)) {
+    std::regex hostRegex(patternAddress, /*std::regex_constants::perl |*/ std::regex_constants::icase);
+    if (!std::regex_match(address, hostRegex)) {
         // Address doesn't match.
         return false;
     }

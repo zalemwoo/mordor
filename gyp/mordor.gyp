@@ -27,7 +27,6 @@
             '-L /usr/local/lib',
             '-lssl',
             '-lcrypto',
-            '-lboost_regex',
             '-lboost_thread',
             '-lboost_system',
             '-llzma',

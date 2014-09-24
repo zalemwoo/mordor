@@ -108,7 +108,6 @@
 #include <boost/multi_index/ordered_index.hpp>
 #include <boost/multi_index/global_fun.hpp>
 #include <boost/multi_index/member.hpp>
-#include <boost/regex.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread/mutex.hpp>
 #include <boost/thread/tss.hpp>
