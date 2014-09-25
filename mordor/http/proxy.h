@@ -10,7 +10,8 @@
 #include <winhttp.h>
 #elif defined (OSX)
 #include <queue>
-#include <boost/thread.hpp>
+#include <thread>
+#include <condition_variable>
 #include <SystemConfiguration/SystemConfiguration.h>
 #include "mordor/util.h"
 #include "mordor/http/broker.h"
@@ -112,8 +113,8 @@ private:
         bool processed;
     };
 
-    boost::thread m_pacThread;
-    boost::condition_variable m_pacCond;
+    std::thread m_pacThread;
+    std::condition_variable m_pacCond;
     std::mutex m_pacMut;
     std::queue<PacMessage*> m_pacQueue;
     bool m_pacThreadCancelled;

@@ -1,9 +1,5 @@
 {
   'includes': ['common.gypi'],
-  'make_global_settings': [
-#    ['CXX','/usr/bin/clang++'],
-#    ['LINK','/usr/bin/clang++'],
-  ],
   'target_defaults': {
     'msvs_settings': {
 #     'msvs_precompiled_header': '../mordor/pch.h',
@@ -21,14 +17,20 @@
       'CLANG_CXX_LIBRARY': 'libc++', # libc++ requires OS X 10.7 or later
     },
 	'conditions': [
+      ['OS == "mac"',{
+        'make_global_settings': [
+          ['CXX','/usr/bin/clang++'],
+          ['LINK','/usr/bin/clang++'],
+        ],
+      }],
       ['OS != "win"',{
         "link_settings": {
         "libraries": [
             '-L /usr/local/lib',
             '-lssl',
             '-lcrypto',
-            '-lboost_thread',
-            '-lboost_system',
+#            '-lboost_thread',
+#            '-lboost_system',
             '-llzma',
             '-lz',
             '-lpthread',

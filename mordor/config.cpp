@@ -5,7 +5,7 @@
 #include <algorithm>
 
 #include <regex>
-#include <boost/thread/thread.hpp>
+#include <thread>
 
 #include "json.h"
 #include "scheduler.h"
@@ -441,7 +441,7 @@ static bool verifyThreadCount(int value)
 static void updateThreadCount(int value, Scheduler &scheduler)
 {
     if (value < 0)
-        value = -value * boost::thread::hardware_concurrency();
+        value = -value * std::thread::hardware_concurrency();
     scheduler.threadCount(value);
 }
 

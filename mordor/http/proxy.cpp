@@ -480,8 +480,8 @@ std::vector<URI> ProxyCache::proxyFromPacScript(CFURLRef cfurl, ScopedCFRef<CFUR
 
         // Start the PAC worker thread if not already running
         // by checking to see if the thread is "Not-a-Thread"
-        if(boost::thread::id() == m_pacThread.get_id()) {
-            m_pacThread = boost::thread(&ProxyCache::runPacWorker, this);
+        if(std::thread::id() == m_pacThread.get_id()) {
+            m_pacThread = std::thread(&ProxyCache::runPacWorker, this);
             MORDOR_LOG_DEBUG(proxyLog) << "PAC worker thread id : " << m_pacThread.get_id();
         }
 

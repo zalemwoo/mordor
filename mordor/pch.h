@@ -95,7 +95,6 @@
 #if !defined(GCC) || defined(__clang__)
 #include <boost/bind.hpp>
 #endif
-#include <boost/blank.hpp>
 #include <boost/exception/all.hpp>
 #include <boost/function.hpp>
 #include <boost/lexical_cast.hpp>
