@@ -1,5 +1,17 @@
 {
   'includes': ['common.gypi'],
+	'conditions': [
+      ['OS == "mac"',{
+		    "cflags": [ "<!@(llvm-config-mp-3.6 --cxxflags)" ],
+        "cflags!": ['-funsigned-char'],
+        "cflags_cc!": ['-funsigned-char'],
+        'make_global_settings': [
+          ['CC','/opt/local/bin/clang++-mp-3.6'],
+          ['CXX','/opt/local/bin/clang++-mp-3.6'],
+          ['LINK','/opt/local/bin/clang++-mp-3.6'],
+        ],
+      }],
+	],
   'target_defaults': {
     'msvs_settings': {
 #     'msvs_precompiled_header': '../mordor/pch.h',
@@ -18,14 +30,23 @@
     },
 	'conditions': [
       ['OS == "mac"',{
-        'make_global_settings': [
-          ['CXX','/usr/bin/clang++'],
-          ['LINK','/usr/bin/clang++'],
-        ],
+        "link_settings": {
+          "ldflags": [ "<!@(llvm-config-mp-3.6 --ldflags)" ],
+          "libraries": [
+            '$(SDKROOT)/System/Library/Frameworks/Foundation.framework',
+          ],
+        },
       }],
+      ['OS == "linux"',{
+        "link_settings": {
+          "libraries": [
+            '-lpthread',
+          ],
+        },
+			}],
       ['OS != "win"',{
         "link_settings": {
-        "libraries": [
+          "libraries": [
 #            '-L /usr/local/lib',
 #            '-lssl',
 #            '-lcrypto',
@@ -33,7 +54,7 @@
 #            '-lboost_system',
 #            '-llzma',
 #            '-lz',
-            '-lpthread',
+#            '-lpthread',
           ],
         },
         'cflags': ['-include ../mordor/pch.h'],
@@ -215,11 +236,11 @@
         '../mordor/tests/fls.cpp',
         '../mordor/tests/future.cpp',
         '../mordor/tests/log.cpp',
-        '../mordor/tests/scheduler.cpp',
+#        '../mordor/tests/scheduler.cpp',
         '../mordor/tests/string.cpp',
         '../mordor/tests/thread.cpp',
         '../mordor/tests/timer.cpp',
-        '../mordor/tests/unicode.cpp',
+#        '../mordor/tests/unicode.cpp',
         '../mordor/tests/util.cpp',
         '../mordor/tests/run_tests.cpp',
       ],

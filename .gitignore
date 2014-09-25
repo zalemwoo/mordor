@@ -55,6 +55,7 @@ test-results/
 out
 gyp/*.mk
 gyp/*.Makefile
+gyp/mordor.xcodeproj
 
 .project
 .cproject

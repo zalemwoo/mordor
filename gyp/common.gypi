@@ -32,7 +32,7 @@
         },
       }], # target_archs == "x64"
 
-      ['OS != "win"',{
+      ['OS == "linux"',{
         'defines':['HAVE_CONFIG_H=1'],
         'cflags': ['-pthread --std=c++11 -fno-strict-aliasing'],
         'include_dirs':[
