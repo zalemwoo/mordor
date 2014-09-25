@@ -207,9 +207,13 @@
       ],
       'sources': [
         '../mordor/tests/atomic.cpp',
+        '../mordor/tests/config.cpp',
         '../mordor/tests/coroutine.cpp',
+        '../mordor/tests/endian.cpp',
         '../mordor/tests/fibers.cpp',
         '../mordor/tests/fibersync.cpp',
+        '../mordor/tests/fls.cpp',
+        '../mordor/tests/future.cpp',
         '../mordor/tests/log.cpp',
         '../mordor/tests/scheduler.cpp',
         '../mordor/tests/string.cpp',
@@ -230,6 +234,7 @@
         'mordor_test',
       ],
       'sources': [
+        '../mordor/tests/buffer.cpp',
         '../mordor/tests/stream.cpp',
 #        '../mordor/tests/socket.cpp',
 #        '../mordor/tests/zlib.cpp',
