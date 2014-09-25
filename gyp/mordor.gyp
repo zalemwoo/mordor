@@ -2,9 +2,6 @@
   'includes': ['common.gypi'],
 	'conditions': [
       ['OS == "mac"',{
-		    "cflags": [ "<!@(llvm-config-mp-3.6 --cxxflags)" ],
-        "cflags!": ['-funsigned-char'],
-        "cflags_cc!": ['-funsigned-char'],
         'make_global_settings': [
           ['CC','/opt/local/bin/clang++-mp-3.6'],
           ['CXX','/opt/local/bin/clang++-mp-3.6'],
@@ -28,8 +25,11 @@
       'MACOSX_DEPLOYMENT_TARGET': '10.8', # OS X Deployment Target: 10.8
       'CLANG_CXX_LIBRARY': 'libc++', # libc++ requires OS X 10.7 or later
     },
-	'conditions': [
+    'conditions': [
       ['OS == "mac"',{
+		    "cflags": [ "<!@(llvm-config-mp-3.6 --cxxflags)" ],
+        "cflags!": ['-funsigned-char'],
+        "cflags_cc!": ['-funsigned-char'],
         "link_settings": {
           "ldflags": [ "<!@(llvm-config-mp-3.6 --ldflags)" ],
           "libraries": [
