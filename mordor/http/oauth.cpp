@@ -219,8 +219,9 @@ void nonceAndTimestamp(T &oauthParameters)
     if (it != oauthParameters.end())
         oauthParameters.erase(it);
     oauthParameters.insert(std::make_pair("oauth_timestamp",
-        boost::lexical_cast<std::string>(toTimeT(
+   //     boost::lexical_cast<std::string>(toTimeT( \
             boost::posix_time::second_clock::universal_time()))));
+    boost::lexical_cast<std::string>(toTimeT(std::chrono::steady_clock::now()))));
     oauthParameters.insert(std::make_pair("oauth_nonce", nonce));
 }
 

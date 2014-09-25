@@ -4,11 +4,9 @@
 
 namespace Mordor {
 
-time_t toTimeT(const boost::posix_time::ptime &ptime)
+time_t toTimeT(const std::chrono::system_clock::time_point &ptime)
 {
-    static const boost::posix_time::ptime time_t_epoch(boost::gregorian::date(1970,1,1));
-    boost::posix_time::time_duration diff = ptime - time_t_epoch;
-    return diff.total_seconds();
+    return std::chrono::system_clock::to_time_t(ptime);
 }
 
 }

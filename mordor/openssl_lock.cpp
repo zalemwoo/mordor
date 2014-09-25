@@ -6,7 +6,7 @@
 #include <boost/utility.hpp>
 
 #ifndef USE_FIBER_MUTEX
-#include <boost/thread/mutex.hpp>
+#include <mutex>
 #else
 #include "fibersynchronization.h"
 #endif

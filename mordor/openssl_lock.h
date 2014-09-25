@@ -7,7 +7,7 @@
 #include "util.h"
 
 #ifndef USE_FIBER_MUTEX
-namespace boost {
+namespace std {
     class mutex;
 }
 #else

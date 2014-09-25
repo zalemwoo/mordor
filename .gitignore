@@ -53,6 +53,8 @@ tags
 test-results/
 
 out
+gyp/*.mk
+gyp/*.Makefile
 
 .project
 .cproject

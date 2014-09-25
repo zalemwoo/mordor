@@ -7,8 +7,6 @@
 #include <mutex>
 #include <iostream>
 
-#include <boost/date_time/posix_time/posix_time_io.hpp>
-
 #include "mordor/config.h"
 #include "mordor/log.h"
 #include "mordor/streams/file.h"

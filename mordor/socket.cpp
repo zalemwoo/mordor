@@ -3,7 +3,6 @@
 #include "socket.h"
 
 #include <boost/bind.hpp>
-#include <boost/thread/once.hpp>
 
 #include "assert.h"
 #include "fiber.h"

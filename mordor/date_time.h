@@ -2,10 +2,10 @@
 #define __MORDOR_DATE_TIME_H__
 // Copyright (c) 2009 - Mozy, Inc.
 
-#include <boost/date_time/posix_time/posix_time.hpp>
+#include <chrono>
 
 namespace Mordor {
-    time_t toTimeT(const boost::posix_time::ptime &ptime);
+    time_t toTimeT(const std::chrono::system_clock::time_point &ptime);
 };
 
 #endif
