@@ -50,6 +50,7 @@ x64
 xcuserdata
 tags
 test-results/
+*~
 
 out
 gyp/*.mk
