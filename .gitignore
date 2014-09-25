@@ -58,3 +58,4 @@ gyp/*.Makefile
 
 .project
 .cproject
+.settings

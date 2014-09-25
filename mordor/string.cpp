@@ -4,8 +4,10 @@
 
 #include <string.h>
 
+#if 0 // Zs
 #include <openssl/md5.h>
 #include <openssl/sha.h>
+#endif // Ze
 
 #ifdef HAVE_CONFIG_H
 #include "autoconfig.h"
@@ -128,6 +130,7 @@ base64encode(const void* data, size_t len)
     return ret;
 }
 
+#if 0 // Zs
 std::string
 md5(const std::string &data)
 {
@@ -266,6 +269,7 @@ hmacSha256(const std::string &text, const std::string &key)
         SHA256_CBLOCK, SHA256_DIGEST_LENGTH>
         (text, key);
 }
+#endif // Ze
 
 void
 hexstringFromData(const void *data, size_t len, char *output)
