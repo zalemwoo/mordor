@@ -85,38 +85,42 @@
       ],
       'sources': [
         '../mordor/assert.cpp',
+        '../mordor/config.cpp',
+        '../mordor/cxa_exception.cpp',
+        '../mordor/date_time.cpp',
         '../mordor/string.cpp',
         '../mordor/statistics.cpp',
         '../mordor/sleep.cpp',
         '../mordor/fiber.cpp',
         '../mordor/fibersynchronization.cpp',
-        '../mordor/thread.cpp',
         '../mordor/workerpool.cpp',
-        '../mordor/cxa_exception.cpp',
         '../mordor/main.cpp',
         '../mordor/exception.cpp',
-        '../mordor/timer.cpp',
         '../mordor/semaphore.cpp',
-        '../mordor/assert.cpp',
-        '../mordor/date_time.cpp',
-        '../mordor/iomanager_epoll.cpp',
         '../mordor/scheduler.cpp',
-        '../mordor/config.cpp',
+        '../mordor/thread.cpp',
+        '../mordor/type_name.cpp',
+        '../mordor/timer.cpp',
         '../mordor/util.cpp',
         '../mordor/parallel.cpp',
         '../mordor/log.cpp',
       ],
       'conditions': [
-        ['OS == "win"', {
+        ['OS == "linux"', {
           'sources':[
-            '../mordor/eventloop.cpp',
-            '../mordor/runtime_linking.cpp',
-            '../mordor/iomanager_iocp.cpp',
+            '../mordor/iomanager_epoll.cpp',
           ]
         }],
         ['OS == "mac"', {
           'sources':[
             '../mordor/iomanager_kqueue.cpp',
+          ]
+        }],
+        ['OS == "win"', {
+          'sources':[
+            '../mordor/eventloop.cpp',
+            '../mordor/runtime_linking.cpp',
+            '../mordor/iomanager_iocp.cpp',
           ]
         }],
       ],
