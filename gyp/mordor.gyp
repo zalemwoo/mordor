@@ -27,7 +27,7 @@
     },
     'conditions': [
       ['OS == "mac"',{
-		    "cflags": [ "<!@(llvm-config-mp-3.6 --cxxflags)" ],
+        "cflags": [ "<!@(llvm-config-mp-3.6 --cxxflags)" ],
         "cflags!": ['-funsigned-char'],
         "cflags_cc!": ['-funsigned-char'],
         "link_settings": {
@@ -43,7 +43,7 @@
             '-lpthread',
           ],
         },
-			}],
+      }],
       ['OS != "win"',{
         "link_settings": {
           "libraries": [
