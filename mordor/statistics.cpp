@@ -22,7 +22,7 @@ static std::ostream &
 dump(std::ostream &os, const Statistic &stat, int level = 0)
 {
     std::string indent(level++ * 4, ' ');
-    os << indent << type(stat) << ": " << stat;
+    os << indent << type_name(stat) << ": " << stat;
     if (stat.units)
         os << " " << stat.units;
     os << std::endl;

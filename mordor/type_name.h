@@ -9,7 +9,7 @@ namespace Mordor{
 std::string demangle(const char* name);
 
 template <class T>
-std::string type(const T& t) {
+std::string type_name(const T& t) {
 
     return demangle(typeid(t).name());
 }
